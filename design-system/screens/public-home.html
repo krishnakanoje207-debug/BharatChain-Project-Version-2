@@ -1,0 +1,814 @@
+<!-- @dsCard group="Screens" name="Public / Citizen Home" subtitle="Portal home — hero slideshow, services, scheme categories, announcements, footer" -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BharatChain — National Welfare Portal</title>
+  <link rel="stylesheet" href="../styles/theme.css" />
+  <style>
+    /* ============================================================
+       Screen-local composition only. Tokens/components = theme.css
+       Layout mirrors a national-portal home: sticky masthead →
+       hero slideshow + search → stats → services → categories →
+       featured scheme → announcements → explore → footer.
+       ============================================================ */
+    .container-wide { width: 100%; max-width: 1320px; margin: 0 auto; padding: 0 var(--sp-5); }
+
+    /* --- Utility strip --- */
+    .util { background: var(--navy-900); color: #c9d6ea; font-size: var(--t-xs); }
+    .util .container-wide { display: flex; align-items: center; justify-content: space-between; height: 34px; }
+    .util .a11y { display: flex; align-items: center; gap: 12px; }
+    .util .a11y button { background: none; border: 0; color: #c9d6ea; cursor: pointer; font: inherit; padding: 2px 5px; border-radius: 4px; }
+    .util .a11y .on { background: rgba(255,255,255,.15); color: #fff; }
+    .util .sep { opacity: .35; }
+
+    /* --- Masthead --- */
+    .masthead { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
+    .masthead .container-wide { display: flex; align-items: center; gap: var(--sp-4); height: 76px; }
+    .brand { display: flex; align-items: center; gap: var(--sp-3); flex: none; }
+    .brand .wm { font-weight: 800; font-size: 1.4rem; letter-spacing: -.02em; color: var(--navy); line-height: 1; }
+    .brand .wm .chain { color: var(--saffron-600); }
+    .brand .beta { font-size: .6rem; font-weight: 800; background: var(--saffron); color: #3a2200; padding: 2px 6px; border-radius: 4px; vertical-align: middle; margin-left: 6px; letter-spacing: .04em; }
+    .brand .motto { font-family: var(--font-serif); font-size: .66rem; color: var(--ink-3); margin-top: 3px; }
+    .m-search { flex: 1; display: flex; max-width: 660px; height: 46px; border: 1px solid var(--border-strong); border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
+    .m-search input { flex: 1; border: 0; padding: 0 var(--sp-3) 0 42px; font: inherit; color: var(--ink); background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%236b7a92' stroke-width='2'%3E%3Ccircle cx='8' cy='8' r='6'/%3E%3Cpath d='M13 13l4 4'/%3E%3C/svg%3E") 14px center no-repeat; }
+    .m-search input:focus { outline: none; }
+    .m-search select { border: 0; border-left: 1px solid var(--border); padding: 0 var(--sp-3); font: inherit; color: var(--ink-2); background: var(--surface-2); cursor: pointer; }
+    .m-search .go { border: 0; background: var(--saffron); color: #3a2200; font-weight: 700; padding: 0 var(--sp-5); cursor: pointer; font-size: var(--t-sm); }
+    .m-search .go:hover { background: var(--saffron-600); }
+    .m-tools { margin-left: auto; display: flex; align-items: center; gap: var(--sp-3); flex: none; color: var(--ink-2); }
+    .m-tools .skip { font-size: var(--t-sm); color: var(--ink-2); }
+    .m-tools .vsep { width: 1px; height: 22px; background: var(--border-strong); }
+    .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); display: grid; place-items: center; cursor: pointer; color: var(--ink-2); }
+    .icon-btn:hover { border-color: var(--navy); color: var(--navy); }
+    .flag-mark { width: 30px; height: 20px; border-radius: 3px; overflow: hidden; display: grid; grid-template-rows: 1fr 1fr 1fr; box-shadow: var(--sh-sm); }
+    .flag-mark i { display: block; } .flag-mark .s { background: var(--saffron); } .flag-mark .w { background: #fff; } .flag-mark .g { background: var(--green); }
+
+    /* --- Hero slideshow --- */
+    .hero { position: relative; min-height: 620px; display: grid; place-items: center; overflow: hidden; color: #eef4ff; isolation: isolate; }
+    .hero .slides { position: absolute; inset: 0; z-index: -2; }
+    .hero .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.1s ease; background-size: cover; background-position: center; }
+    .hero .slide.on { opacity: 1; }
+    /* branded gradient fallbacks until real photos are added to HERO_SLIDES */
+    .hero .slide.g1 { background: radial-gradient(900px 520px at 50% -8%, rgba(255,153,51,.28), transparent 60%), linear-gradient(165deg, #123b6e 0%, var(--navy-900) 70%); }
+    .hero .slide.g2 { background: radial-gradient(800px 480px at 70% 0%, rgba(19,136,8,.26), transparent 60%), linear-gradient(160deg, #0d3460 0%, #04162c 75%); }
+    .hero .slide.g3 { background: radial-gradient(900px 520px at 30% -5%, rgba(31,111,235,.30), transparent 60%), linear-gradient(170deg, #0b2e59 0%, #050f1f 78%); }
+    .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(4,15,32,.30) 0%, rgba(4,15,32,.55) 100%); }
+    .hero .inner { text-align: center; padding: var(--sp-9) var(--sp-5) calc(var(--sp-9) + 70px); max-width: 880px; }
+    .hero .emblem-lg { width: 76px; height: 76px; margin: 0 auto var(--sp-3); }
+    .hero .wordmark { font-size: clamp(2.6rem, 6vw, 4rem); font-weight: 800; letter-spacing: -.03em; color: #fff; line-height: 1; display: inline-block; }
+    .hero .wordmark .chain { color: var(--saffron); }
+    .hero .uline { width: 220px; height: 5px; margin: 12px auto 0; border-radius: 3px; background: linear-gradient(90deg, var(--saffron) 0 50%, var(--green) 50% 100%); }
+    .hero .beta { font-size: .9rem; font-weight: 800; background: var(--saffron); color: #3a2200; padding: 3px 9px; border-radius: 5px; vertical-align: super; margin-left: 8px; }
+    .hero .pt { margin-top: var(--sp-4); font-size: clamp(1.1rem, 2.4vw, 1.55rem); font-weight: 700; color: #fff; }
+    .hero .ps { margin-top: var(--sp-2); color: #c2d3ec; font-size: var(--t-lg); }
+    .hero .search { margin: var(--sp-6) auto 0; max-width: 760px; padding: 7px; }
+    .hero .search select { border: 0; background: transparent; font: inherit; color: var(--ink-2); padding: 0 var(--sp-3); border-left: 1px solid var(--border); cursor: pointer; }
+    .hero .trending { margin-top: var(--sp-5); display: flex; flex-wrap: wrap; gap: var(--sp-2); justify-content: center; align-items: center; }
+    .hero .trending .lead { color: #b9cce8; font-size: var(--t-sm); font-weight: 600; }
+    .hero .trending .chip { background: rgba(255,255,255,.10); color: #eaf2ff; border-color: rgba(255,255,255,.28); }
+    .hero .trending .chip:hover { background: rgba(255,255,255,.20); border-color: #fff; color: #fff; }
+    .hero .dots { position: absolute; bottom: 84px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 2; }
+    .hero .dots button { width: 9px; height: 9px; border-radius: 50%; border: 0; background: rgba(255,255,255,.4); cursor: pointer; padding: 0; }
+    .hero .dots button.on { background: var(--saffron); width: 26px; border-radius: 5px; }
+
+    /* --- Floating stats strip --- */
+    .stats-wrap { position: relative; z-index: 5; margin-top: -56px; }
+    .stats-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--sh-lg); border: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(6, 1fr); }
+    .stat-cell { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-5); border-right: 1px solid var(--border); }
+    .stat-cell:last-child { border-right: 0; }
+    .stat-cell .ic { width: 46px; height: 46px; flex: none; border-radius: var(--r-md); display: grid; place-items: center; background: var(--info-bg); color: var(--info-fg); }
+    .stat-cell .num { font-size: var(--t-2xl); font-weight: 800; color: var(--navy); line-height: 1; letter-spacing: -.02em; }
+    .stat-cell .lbl { font-size: var(--t-xs); color: var(--ink-2); margin-top: 4px; line-height: 1.25; }
+
+    /* --- Section heading (centered, underlined) --- */
+    .head-c { text-align: center; margin-bottom: var(--sp-6); }
+    .head-c h2 { display: inline-block; }
+    .head-c .uline { width: 64px; height: 4px; margin: 10px auto 0; background: var(--saffron); border-radius: 3px; }
+    .head-c p { margin-top: var(--sp-3); color: var(--ink-2); }
+
+    /* --- Services panel + carousel --- */
+    .services { display: grid; grid-template-columns: 420px 1fr; gap: var(--sp-5); align-items: stretch; }
+    .svc-panel { background: linear-gradient(160deg, var(--navy) 0%, var(--navy-900) 100%); color: #fff; border-radius: var(--r-lg); padding: var(--sp-6); position: relative; overflow: hidden; }
+    .svc-panel h2 { color: #fff; }
+    .svc-panel .uline { width: 70px; height: 4px; background: var(--saffron); border-radius: 3px; margin: 10px 0 var(--sp-5); }
+    .svc-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+    .svc-tile { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); border-radius: var(--r-md); padding: var(--sp-4); text-align: center; }
+    .svc-tile .ic { color: var(--saffron); margin-bottom: var(--sp-2); display: inline-grid; }
+    .svc-tile .n { font-size: var(--t-2xl); font-weight: 800; color: #fff; line-height: 1; }
+    .svc-tile .t { font-size: var(--t-xs); color: #c2d3ec; margin-top: 6px; text-transform: uppercase; letter-spacing: .05em; }
+    .svc-panel .cta { margin-top: var(--sp-5); display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+    .svc-panel .cta span { font-size: var(--t-sm); color: #c2d3ec; }
+
+    .svc-carousel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--sp-5); position: relative; }
+    .caro { display: flex; gap: var(--sp-4); overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: var(--sp-3); }
+    .caro::-webkit-scrollbar { height: 6px; } .caro::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+    .svc-item { flex: 0 0 230px; scroll-snap-align: start; border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; background: var(--surface); transition: box-shadow .18s, transform .18s; }
+    .svc-item:hover { box-shadow: var(--sh-md); transform: translateY(-2px); }
+    .svc-item .thumb { height: 130px; position: relative; display: grid; place-items: center; color: #fff; font-weight: 700; text-align: center; padding: var(--sp-3); }
+    .svc-item .thumb .tag { position: absolute; top: 10px; left: 10px; }
+    .svc-item .body { padding: var(--sp-4); }
+    .svc-item .body h4 { font-size: var(--t-base); }
+    .svc-item .body p { font-size: var(--t-sm); margin-top: 4px; }
+    .caro-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--surface); color: var(--navy); display: grid; place-items: center; cursor: pointer; box-shadow: var(--sh-md); z-index: 3; }
+    .caro-nav:hover { background: var(--navy); color: #fff; }
+    .caro-nav.prev { left: -14px; } .caro-nav.next { right: -14px; }
+
+    /* --- Categories grid --- */
+    .cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-4); }
+    .cat { display: flex; gap: var(--sp-4); align-items: flex-start; }
+    .cat .ic { width: 52px; height: 52px; flex: none; border-radius: var(--r-md); display: grid; place-items: center; background: var(--navy); color: #fff; }
+    .cat h3 { font-size: var(--t-lg); }
+    .cat p { font-size: var(--t-sm); margin-top: 4px; }
+
+    /* --- Featured scheme banner --- */
+    .banner { border-radius: var(--r-xl); overflow: hidden; position: relative; background: linear-gradient(110deg, #0b2e59 0%, #123b6e 55%, #16487f 100%); color: #fff; }
+    .banner .inner { display: grid; grid-template-columns: 1.05fr 1fr; gap: var(--sp-6); align-items: center; padding: var(--sp-7); }
+    .banner .ph { aspect-ratio: 16/10; border-radius: var(--r-lg); background:
+        repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 12px, rgba(255,255,255,.02) 12px 24px); border: 1px dashed rgba(255,255,255,.3); display: grid; place-items: center; color: #aac3e6; font-family: ui-monospace, monospace; font-size: var(--t-xs); text-align: center; }
+    .banner .kicker { color: var(--saffron); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: var(--t-sm); }
+    .banner h2 { color: #fff; margin-top: var(--sp-2); }
+    .banner .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); margin: var(--sp-5) 0; }
+    .banner .metrics .v { font-size: var(--t-2xl); font-weight: 800; color: var(--saffron); line-height: 1; }
+    .banner .metrics .k { font-size: var(--t-sm); color: #c2d3ec; margin-top: 4px; }
+
+    .scheme-search { margin-top: var(--sp-7); }
+    .scheme-search .box { display: flex; gap: var(--sp-2); background: var(--surface); border: 1px solid var(--border-strong); border-radius: var(--r-lg); padding: 8px; max-width: 760px; margin: 0 auto; box-shadow: var(--sh-sm); }
+    .scheme-search .box input { flex: 1; border: 0; padding: 0 var(--sp-4); height: 50px; font: inherit; font-size: var(--t-lg); }
+    .scheme-search .box input:focus { outline: none; }
+
+    /* --- Announcements + Spotlight --- */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-7); }
+    .col-head { margin-bottom: var(--sp-4); }
+    .col-head h2 { font-size: var(--t-2xl); display: inline-block; }
+    .col-head .uline { width: 56px; height: 4px; background: var(--saffron); border-radius: 3px; margin-top: 8px; }
+    .col-head .sub { color: var(--ink-3); font-size: var(--t-sm); margin-top: 8px; }
+    .feed-item { display: flex; gap: var(--sp-3); padding: var(--sp-4); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--surface); margin-bottom: var(--sp-3); transition: box-shadow .15s, border-color .15s; }
+    .feed-item:hover { box-shadow: var(--sh-sm); border-color: var(--border-strong); }
+    .feed-item .src { width: 44px; height: 44px; flex: none; border-radius: var(--r-sm); display: grid; place-items: center; background: var(--info-bg); color: var(--info-fg); font-weight: 800; font-size: var(--t-xs); }
+    .feed-item .meta { display: flex; justify-content: space-between; font-size: var(--t-xs); color: var(--ink-3); margin-bottom: 4px; }
+    .feed-item .ttl { font-weight: 600; font-size: var(--t-sm); color: var(--ink); line-height: 1.4; }
+    .spotlight { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; background: var(--surface); }
+    .spotlight .feature { background: var(--navy); color: #fff; padding: var(--sp-5); }
+    .spotlight .feature .ph { aspect-ratio: 4/3; border-radius: var(--r-md); margin-bottom: var(--sp-4); background:
+        repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 12px, rgba(255,255,255,.02) 12px 24px); border: 1px dashed rgba(255,255,255,.3); display: grid; place-items: center; color: #aac3e6; font-family: ui-monospace, monospace; font-size: var(--t-xs); }
+    .spotlight .feature h3 { color: #fff; }
+    .spotlight .feature p { color: #c2d3ec; font-size: var(--t-sm); margin-top: var(--sp-2); }
+    .spotlight .list { padding: var(--sp-5); }
+    .spotlight .list .row { padding: var(--sp-3) 0; border-bottom: 1px solid var(--border); }
+    .spotlight .list .row:last-child { border-bottom: 0; }
+    .spotlight .list .row .when { font-size: var(--t-xs); color: var(--ink-3); }
+    .spotlight .list .row .t { font-weight: 600; font-size: var(--t-sm); color: var(--ink); margin-top: 2px; }
+    .spotlight .list .row:hover .t { color: var(--navy); }
+
+    /* --- Explore transparency --- */
+    .explore { display: grid; grid-template-columns: 1.1fr 1fr; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--sh-md); }
+    .explore .visual { position: relative; min-height: 420px; background:
+        repeating-linear-gradient(45deg, #11305a 0 16px, #0d2a50 16px 32px); display: grid; place-items: end start; padding: var(--sp-5); color: #fff; }
+    .explore .visual .cap { font-family: ui-monospace, monospace; font-size: var(--t-sm); background: rgba(0,0,0,.4); padding: 6px 12px; border-radius: var(--r-sm); }
+    .explore .tiles { background: linear-gradient(160deg, var(--navy) 0%, var(--navy-700) 100%); padding: var(--sp-6); display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); align-content: center; }
+    .ex-tile { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: var(--r-md); padding: var(--sp-5) var(--sp-4); text-align: center; color: #fff; cursor: pointer; transition: background .15s, transform .15s; }
+    .ex-tile:hover { background: rgba(255,255,255,.16); transform: translateY(-2px); }
+    .ex-tile .ic { color: #fff; margin-bottom: var(--sp-3); display: inline-grid; }
+    .ex-tile .t { font-weight: 700; font-size: var(--t-base); }
+
+    /* --- Footer --- */
+    footer { background: #050f1f; color: #aabbd4; margin-top: 0; }
+    .partners { border-bottom: 1px solid rgba(255,255,255,.08); }
+    .partners .container-wide { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-5); padding: var(--sp-6) var(--sp-5); }
+    .partner { color: #cdd9ec; font-weight: 700; font-size: var(--t-sm); letter-spacing: .02em; opacity: .85; display: flex; align-items: center; gap: 8px; }
+    .partner:hover { opacity: 1; }
+    .partner .sq { width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center; background: rgba(255,255,255,.1); color: var(--saffron); font-size: .7rem; }
+    .foot-main .container-wide { padding: var(--sp-7) var(--sp-5); display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; gap: var(--sp-6); }
+    footer h4 { color: #fff; font-size: var(--t-sm); text-transform: uppercase; letter-spacing: .06em; margin-bottom: var(--sp-3); }
+    footer a { display: block; color: #aabbd4; font-size: var(--t-sm); padding: 5px 0; }
+    footer a:hover { color: #fff; }
+    footer .brand .wm { color: #fff; } footer .brand .motto { color: #7e93b4; }
+    .qr { width: 92px; height: 92px; border-radius: var(--r-sm); background: repeating-conic-gradient(#fff 0 25%, #050f1f 0 50%) 0 0 / 14px 14px; border: 4px solid #fff; }
+    .disclaimer { background: var(--navy-900); }
+    .disclaimer .container-wide { display: flex; gap: var(--sp-5); align-items: flex-start; padding: var(--sp-5); }
+    .disclaimer .tag { flex: none; background: var(--navy-700); color: #fff; font-weight: 700; padding: var(--sp-4); border-radius: var(--r-sm); font-size: var(--t-sm); width: 130px; }
+    .disclaimer p { color: #93a6c4; font-size: var(--t-sm); }
+    .credit { border-top: 1px solid rgba(255,255,255,.08); }
+    .credit .container-wide { display: flex; gap: var(--sp-4); align-items: center; padding: var(--sp-5); }
+    .credit .nic { flex: none; color: #fff; font-weight: 800; border: 2px solid rgba(255,255,255,.4); border-radius: var(--r-sm); padding: 8px 12px; font-size: var(--t-sm); }
+    .credit p { color: #7e93b4; font-size: var(--t-xs); }
+
+    /* Developer credits */
+    .devs { border-top: 1px solid rgba(255,255,255,.08); background: #040c19; }
+    .devs .container-wide { padding: var(--sp-6) var(--sp-5); text-align: center; }
+    .devs .lead { color: #7e93b4; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: .12em; font-weight: 700; }
+    .devs .grid-devs { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); margin-top: var(--sp-5); max-width: 760px; margin-left: auto; margin-right: auto; }
+    .dev { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .dev .av { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #fff; font-size: var(--t-sm); }
+    .dev .nm { color: #dce6f3; font-weight: 600; font-size: var(--t-sm); }
+    .dev .role { color: #7e93b4; font-size: var(--t-xs); }
+    @media (max-width: 860px) { .devs .grid-devs { grid-template-columns: 1fr 1fr; } }
+
+    /* --- Side rail + AI assistant FAB + back to top --- */
+    .rail { position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 45; display: flex; flex-direction: column; gap: 2px; }
+    .rail button { width: 42px; height: 44px; border: 0; background: var(--surface); color: var(--ink-2); display: grid; place-items: center; cursor: pointer; box-shadow: -2px 0 8px rgba(15,27,45,.08); border-bottom: 1px solid var(--border); }
+    .rail button:first-child { border-top-left-radius: var(--r-md); } .rail button:last-child { border-bottom-left-radius: var(--r-md); border-bottom: 0; }
+    .rail button:hover { background: var(--navy); color: #fff; }
+
+    .ai-fab { position: fixed; right: 26px; bottom: 26px; z-index: 50; display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 22px 0 16px; border: 0; border-radius: var(--r-full); cursor: pointer;
+      background: linear-gradient(135deg, var(--navy) 0%, #16487f 100%); color: #fff; font: inherit; font-weight: 700; box-shadow: 0 10px 30px rgba(11,46,89,.45); }
+    .ai-fab:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(11,46,89,.55); }
+    .ai-fab .orb { width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--saffron) 0%, var(--saffron-600) 70%); display: grid; place-items: center; flex: none; box-shadow: 0 0 0 4px rgba(255,153,51,.18); }
+    .ai-fab .orb::after { content: ""; position: absolute; }
+    .ai-fab .pulse { position: absolute; right: 14px; top: 12px; width: 9px; height: 9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 0 rgba(19,136,8,.6); animation: aip 2s infinite; }
+    @keyframes aip { 0% { box-shadow: 0 0 0 0 rgba(19,136,8,.5); } 70% { box-shadow: 0 0 0 9px rgba(19,136,8,0); } 100% { box-shadow: 0 0 0 0 rgba(19,136,8,0); } }
+    .totop { position: fixed; right: 30px; bottom: 96px; z-index: 49; width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--navy-900); color: #fff; cursor: pointer; display: none; place-items: center; box-shadow: var(--sh-md); }
+    .totop.show { display: grid; }
+
+    /* Scroll-reveal (progressive enhancement: visible by default, JS opts in) */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1 !important; transform: none !important; transition: none; } }
+
+    /* Live on-chain ledger ticker */
+    .ticker { background: var(--navy-900); border-top: 1px solid rgba(255,255,255,.07); border-bottom: 1px solid rgba(255,255,255,.07); display: flex; align-items: center; gap: var(--sp-4); padding: 11px var(--sp-5); overflow: hidden; }
+    .ticker .tag { flex: none; display: inline-flex; align-items: center; gap: 8px; color: #fff; font-weight: 700; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: .08em; }
+    .ticker .tag .live { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 0 rgba(19,136,8,.6); animation: aip 2s infinite; }
+    .ticker .vp { flex: 1; overflow: hidden; }
+    .ticker .track { display: inline-flex; gap: var(--sp-6); white-space: nowrap; animation: tick 42s linear infinite; will-change: transform; }
+    .ticker:hover .track { animation-play-state: paused; }
+    .ticker .tx { display: inline-flex; align-items: center; gap: 8px; color: #93a8cb; font-size: var(--t-sm); font-family: ui-monospace, "SF Mono", monospace; }
+    .ticker .tx b { color: #e7f0ff; font-weight: 600; } .ticker .tx .ok { color: #5fd35a; }
+    @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* AI chat panel */
+    .ai-panel { position: fixed; right: 26px; bottom: 94px; z-index: 51; width: 366px; max-width: calc(100vw - 36px); height: 500px; max-height: calc(100vh - 130px);
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--sh-lg); display: flex; flex-direction: column; overflow: hidden; }
+    .ai-panel[hidden] { display: none; }
+    .ai-head { display: flex; align-items: center; justify-content: space-between; padding: var(--sp-3) var(--sp-4); background: linear-gradient(135deg, var(--navy) 0%, #16487f 100%); color: #fff; }
+    .ai-head .who { display: flex; align-items: center; gap: 10px; }
+    .ai-head .orb { width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, var(--saffron) 0%, var(--saffron-600) 70%); display: grid; place-items: center; flex: none; }
+    .ai-head .t { font-weight: 700; font-size: var(--t-sm); line-height: 1.1; } .ai-head .s { font-size: var(--t-xs); color: #c2d3ec; }
+    .ai-close { background: rgba(255,255,255,.16); border: 0; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; }
+    .ai-close:hover { background: rgba(255,255,255,.3); }
+    .ai-body { flex: 1; overflow-y: auto; padding: var(--sp-4); display: flex; flex-direction: column; gap: var(--sp-3); background: var(--bg); }
+    .msg { max-width: 85%; padding: 10px 13px; border-radius: 14px; font-size: var(--t-sm); line-height: 1.45; }
+    .msg.bot { background: var(--surface); border: 1px solid var(--border); color: var(--ink); align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg.me { background: var(--navy); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg.typing { color: var(--ink-3); font-style: italic; }
+    .ai-sugs { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 var(--sp-4) var(--sp-3); background: var(--bg); }
+    .ai-sugs button { font: inherit; font-size: var(--t-xs); border: 1px solid var(--border-strong); background: var(--surface); color: var(--navy); border-radius: var(--r-full); padding: 6px 10px; cursor: pointer; }
+    .ai-sugs button:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .ai-input { display: flex; gap: 8px; padding: var(--sp-3); border-top: 1px solid var(--border); background: var(--surface); }
+    .ai-input input { flex: 1; border: 1px solid var(--border-strong); border-radius: var(--r-md); padding: 0 var(--sp-3); height: 42px; font: inherit; }
+    .ai-input input:focus { outline: none; border-color: var(--link); box-shadow: var(--ring); }
+    .ai-input button { width: 42px; height: 42px; border: 0; border-radius: var(--r-md); background: var(--saffron); color: #3a2200; font-weight: 800; cursor: pointer; font-size: 18px; }
+    .ai-input button:hover { background: var(--saffron-600); }
+
+    @media (max-width: 1100px) {
+      .services { grid-template-columns: 1fr; }
+      .cat-grid { grid-template-columns: 1fr 1fr; }
+      .stats-card { grid-template-columns: repeat(3, 1fr); }
+      .stat-cell:nth-child(3n) { border-right: 0; }
+    }
+    @media (max-width: 860px) {
+      .m-search, .m-tools .skip { display: none; }
+      .banner .inner, .two-col, .explore, .spotlight { grid-template-columns: 1fr; }
+      .foot-main .container-wide { grid-template-columns: 1fr 1fr; }
+      .cat-grid, .stats-card { grid-template-columns: 1fr 1fr; }
+      .stat-cell:nth-child(2n) { border-right: 0; }
+      .ai-fab span.txt { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <hr class="tricolor" />
+
+  <!-- Utility strip -->
+  <div class="util">
+    <div class="container-wide">
+      <span>भारत सरकार &nbsp;<span class="sep">|</span>&nbsp; Government of India · A Digital India Initiative</span>
+      <div class="a11y">
+        <span>Text size</span>
+        <button title="Decrease">A−</button>
+        <button class="on" title="Normal">A</button>
+        <button title="Increase">A+</button>
+        <span class="sep">|</span>
+        <button title="High contrast">◐ Contrast</button>
+        <span class="sep">|</span>
+        <button class="on">EN</button><button>हिं</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="container-wide">
+      <a href="#" class="brand" style="text-decoration:none">
+        <span class="emblem" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+            <circle cx="50" cy="50" r="30" /><circle cx="50" cy="50" r="6" fill="currentColor" />
+            <line x1="50" y1="20" x2="50" y2="80" /><line x1="20" y1="50" x2="80" y2="50" />
+            <line x1="29" y1="29" x2="71" y2="71" /><line x1="71" y1="29" x2="29" y2="71" />
+          </svg>
+        </span>
+        <div>
+          <div class="wm">Bharat<span class="chain">Chain</span><span class="beta">BETA</span></div>
+          <div class="motto">सत्यमेव जयते · National Welfare Portal</div>
+        </div>
+      </a>
+
+      <div class="m-search">
+        <input placeholder="Search schemes, services, vendors…" />
+        <select aria-label="Category">
+          <option>All Categories</option>
+          <option>Schemes</option>
+          <option>Services</option>
+          <option>Vendors</option>
+          <option>Public Ledger</option>
+        </select>
+        <button class="go">Search</button>
+      </div>
+
+      <div class="m-tools">
+        <a href="#" class="skip">Skip to main content</a>
+        <span class="vsep"></span>
+        <button class="icon-btn" title="Calendar" aria-label="Calendar">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="3.5" width="13" height="12" rx="2"/><path d="M2.5 7h13M6 2v3M12 2v3"/></svg>
+        </button>
+        <button class="icon-btn" title="Accessibility" aria-label="Accessibility">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="3.5" r="1.6"/><path d="M3 6h12M9 6v6M9 12l-3 4M9 12l3 4"/></svg>
+        </button>
+        <button class="icon-btn" title="Language" aria-label="Language">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="7"/><path d="M2 9h14M9 2c2.5 2.6 2.5 11.4 0 14M9 2c-2.5 2.6-2.5 11.4 0 14"/></svg>
+        </button>
+        <span class="flag-mark" title="India"><i class="s"></i><i class="w"></i><i class="g"></i></span>
+        <button class="icon-btn" title="Menu" aria-label="Menu">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 5h14M2 9h14M2 13h14"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       HERO SLIDESHOW
+       To add background photos: drop image URLs into HERO_SLIDES
+       in the script at the bottom. Until then, branded gradients show.
+       ============================================================ -->
+  <section class="hero" id="hero">
+    <div class="slides" id="heroSlides">
+      <div class="slide g1 on"></div>
+      <div class="slide g2"></div>
+      <div class="slide g3"></div>
+    </div>
+    <div class="inner">
+      <span class="emblem emblem-lg" aria-hidden="true">
+        <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+          <circle cx="50" cy="50" r="30" /><circle cx="50" cy="50" r="6" fill="currentColor" />
+          <line x1="50" y1="20" x2="50" y2="80" /><line x1="20" y1="50" x2="80" y2="50" />
+          <line x1="29" y1="29" x2="71" y2="71" /><line x1="71" y1="29" x2="29" y2="71" />
+          <line x1="38" y1="22" x2="62" y2="78" /><line x1="62" y1="22" x2="38" y2="78" />
+          <line x1="22" y1="38" x2="78" y2="62" /><line x1="78" y1="38" x2="22" y2="62" />
+        </svg>
+      </span>
+      <div class="wordmark">Bharat<span class="chain">Chain</span><span class="beta">BETA</span></div>
+      <div class="uline"></div>
+      <div class="pt">Transparent Welfare, Delivered On-Chain</div>
+      <div class="ps">Every rupee of public benefit — applied for, disbursed, and spent — auditable end to end.</div>
+
+      <div class="search">
+        <input class="field" placeholder="Search a scheme — e.g. farmer, scholarship, housing…" />
+        <select aria-label="Category">
+          <option>All Schemes</option>
+          <option>Agriculture</option>
+          <option>Education</option>
+          <option>Housing</option>
+          <option>Health</option>
+        </select>
+        <button class="btn btn-accent btn-lg">Search</button>
+      </div>
+
+      <div class="trending">
+        <span class="lead">Trending:</span>
+        <span class="chip">PM-Kisan Samman Nidhi</span>
+        <span class="chip">Vidya Lakshmi Scholarship</span>
+        <span class="chip">PM Awas Yojana</span>
+        <span class="chip">Track my application</span>
+      </div>
+
+      <div style="margin-top:var(--sp-5)">
+        <a href="public-ledger.html" class="btn btn-lg" style="background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28)">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="12" height="13" rx="2"/><path d="M6 7h6M6 10h6M6 13h4"/></svg>
+          View the public ledger →
+        </a>
+      </div>
+    </div>
+    <div class="dots" id="heroDots"></div>
+  </section>
+
+  <!-- Floating stats -->
+  <div class="stats-wrap">
+    <div class="container-wide">
+      <div class="stats-card">
+        <div class="stat-cell"><span class="ic"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h10M5 8h10M6 4c5 0 6 8 0 8M6 12l7 6"/></svg></span><div><div class="num" data-to="2340" data-prefix="₹" data-suffix=" Cr" data-comma>₹2,340 Cr</div><div class="lbl">Disbursed transparently</div></div></div>
+        <div class="stat-cell"><span class="ic"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="12" y="3" width="7" height="7" rx="1"/><rect x="3" y="12" width="7" height="7" rx="1"/><rect x="12" y="12" width="7" height="7" rx="1"/></svg></span><div><div class="num" data-to="128">128</div><div class="lbl">Active schemes</div></div></div>
+        <div class="stat-cell"><span class="ic"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="7" r="3"/><path d="M2 19c0-3.3 2.7-5 6-5M14 5a3 3 0 010 6M14 14c2.8.4 5 2.2 5 5"/></svg></span><div><div class="num" data-to="4.6" data-decimals="1" data-suffix=" L">4.6 L</div><div class="lbl">Beneficiaries enrolled</div></div></div>
+        <div class="stat-cell"><span class="ic"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h15l-1 9H4zM3 7l-1-3M7 11h7"/><circle cx="7" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg></span><div><div class="num" data-to="12480" data-comma>12,480</div><div class="lbl">Approved vendors</div></div></div>
+        <div class="stat-cell"><span class="ic"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 2l7 3v5c0 4.5-3 7-7 9-4-2-7-4.5-7-9V5z"/><path d="M8 11l2.2 2.2L15 8.5"/></svg></span><div><div class="num" data-to="0">0</div><div class="lbl">Leakage — audited on-chain</div></div></div>
+        <div class="stat-cell"><span class="ic"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="8" height="6" rx="3"/><rect x="12" y="9" width="8" height="6" rx="3"/><path d="M8 10h6"/></svg></span><div><div class="num" data-to="100" data-suffix="%">100%</div><div class="lbl">Records on public ledger</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live on-chain ledger ticker -->
+  <div class="ticker" aria-label="Live on-chain activity">
+    <span class="tag"><span class="live"></span> Live on-chain</span>
+    <div class="vp"><div class="track" id="tickerTrack"></div></div>
+  </div>
+
+  <!-- Citizen Services -->
+  <section class="section container-wide">
+    <div class="services">
+      <div class="svc-panel">
+        <h2>Citizen Services</h2>
+        <div class="uline"></div>
+        <div class="svc-tiles">
+          <div class="svc-tile"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11l9-7 9 7M6 10v10h12V10"/></svg></span><div class="n">128</div><div class="t">Schemes</div></div>
+          <div class="svc-tile"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13" cy="13" r="9"/><path d="M13 8v5l3 3"/></svg></span><div class="n">Track</div><div class="t">Applications</div></div>
+          <div class="svc-tile"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="20" height="13" rx="2"/><path d="M17 13h2M3 11h20"/></svg></span><div class="n">Wallet</div><div class="t">e-Rupee</div></div>
+          <div class="svc-tile"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 3l8 4v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V7z"/><path d="M9.5 12l2.5 2.5L17 9.5"/></svg></span><div class="n">ZK</div><div class="t">Eligibility</div></div>
+        </div>
+        <div class="cta">
+          <span>Apply online &amp; save time — no office visits.</span>
+          <a href="#" class="btn btn-accent btn-sm">View All</a>
+        </div>
+      </div>
+
+      <div class="svc-carousel">
+        <button class="caro-nav prev" data-caro="svc" aria-label="Previous">‹</button>
+        <button class="caro-nav next" data-caro="svc" aria-label="Next">›</button>
+        <div class="caro" id="svc">
+          <div class="svc-item"><div class="thumb" style="background:linear-gradient(135deg,#138808,#0f7106)"><span class="badge badge-ok tag"><span class="dot"></span> Active</span>Agriculture</div><div class="body"><h4>PM-Kisan Samman Nidhi</h4><p>₹10,000 / installment · 3× a year, paid to wallet.</p></div></div>
+          <div class="svc-item"><div class="thumb" style="background:linear-gradient(135deg,#1f6feb,#14457a)"><span class="badge badge-info tag">Education</span>Scholarship</div><div class="body"><h4>Vidya Lakshmi Scholarship</h4><p>₹50,000 / installment · eligibility checked privately via ZK (income &amp; more).</p></div></div>
+          <div class="svc-item"><div class="thumb" style="background:linear-gradient(135deg,#ff9933,#e87f1e)"><span class="badge badge-info tag">Housing</span>PM Awas</div><div class="body"><h4>PM Awas Yojana</h4><p>₹50,000 / installment · 3× a year for eligible households.</p></div></div>
+          <a class="svc-item" href="#" style="text-decoration:none"><div class="thumb" style="background:linear-gradient(135deg,#0b2e59,#16487f)"><span class="badge tag">Browse</span>All schemes</div><div class="body"><h4>Explore all schemes →</h4><p>Search every active scheme by sector, ministry or name.</p></div></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scheme Categories -->
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="container-wide">
+      <div class="head-c">
+        <h2>Scheme Categories</h2>
+        <div class="uline"></div>
+        <p>Browse welfare schemes by sector. Eligibility is checked privately with a zero-knowledge proof.</p>
+      </div>
+      <div class="cat-grid">
+        <div class="cat"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 21V11M13 11C13 7 16 4 21 4c0 5-4 7-8 7zM13 13C13 9 9 6 5 7c0 4 4 6 8 6z"/></svg></span><div><h3>Agriculture &amp; Rural</h3><p>Income support, crop insurance and rural-livelihood benefits paid directly to farmers.</p></div></div>
+        <div class="cat"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 4L2 9l11 5 9-4.1V15M6 11.5V16c0 1.5 3 3 7 3s7-1.5 7-3v-4.5"/></svg></span><div><h3>Education &amp; Skilling</h3><p>Scholarships, fellowships and training stipends, means-tested and transparently tracked.</p></div></div>
+        <div class="cat"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11l9-7 9 7M6 10v10h12V10M11 20v-5h4v5"/></svg></span><div><h3>Housing &amp; Urban</h3><p>Construction grants and rent assistance disbursed in scheduled, auditable installments.</p></div></div>
+        <div class="cat"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 22S3 15 3 8.5A4.5 4.5 0 0113 5a4.5 4.5 0 0110 3.5C23 15 13 22 13 22z"/></svg></span><div><h3>Health &amp; Wellness</h3><p>Insurance cover, nutrition support and cashless treatment verified at approved facilities.</p></div></div>
+        <div class="cat"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="20" height="12" rx="2"/><path d="M9 8V6a2 2 0 012-2h4a2 2 0 012 2v2M3 13h20"/></svg></span><div><h3>Employment</h3><p>Wage support, MGNREGA payments and entrepreneurship grants for the workforce.</p></div></div>
+        <div class="cat"><span class="ic"><svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 3l8 4v5c0 5-3.5 8-8 10-4.5-2-8-5-8-10V7z"/><path d="M9.5 12l2.5 2.5L17 9.5"/></svg></span><div><h3>Pensions &amp; Welfare</h3><p>Old-age, widow and disability pensions delivered reliably with full payment history.</p></div></div>
+      </div>
+      <div style="text-align:center;margin-top:var(--sp-6)"><a href="#" class="btn btn-secondary">View all categories</a></div>
+    </div>
+  </section>
+
+  <!-- Featured scheme banner -->
+  <section class="section container-wide">
+    <div class="banner">
+      <div class="inner">
+        <div class="ph">[ featured scheme image — replace ]</div>
+        <div>
+          <div class="kicker">Featured Scheme</div>
+          <h2>PM-Kisan Samman Nidhi</h2>
+          <p style="color:#c2d3ec;margin-top:var(--sp-2)">Income support for eligible farmer families — paid straight to the beneficiary's e-Rupee wallet and spendable only at approved agri-input vendors. Every installment is auditable on the public ledger, end to end.</p>
+          <div class="metrics">
+            <div><div class="v">₹10,000</div><div class="k">per installment · 3× a year (₹30,000 annually)</div></div>
+            <div><div class="v">100%</div><div class="k">disbursed directly to wallets — no intermediaries</div></div>
+            <div><div class="v">ZK</div><div class="k">eligibility proven privately against the registry</div></div>
+            <div><div class="v">0</div><div class="k">leakage — every rupee audited on-chain</div></div>
+          </div>
+          <a href="#" class="btn btn-accent">Check eligibility →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="scheme-search">
+      <div class="head-c"><h2>Find a Government Scheme</h2><div class="uline"></div></div>
+      <div class="box">
+        <input placeholder="Search schemes by name, sector or ministry…" />
+        <button class="btn btn-primary btn-lg" aria-label="Search">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Announcements + Spotlight -->
+  <section class="section" style="background:var(--surface);border-top:1px solid var(--border)">
+    <div class="container-wide">
+      <div class="two-col">
+        <div>
+          <div class="col-head">
+            <h2>Announcements &amp; Notices</h2><div class="uline"></div>
+            <div class="sub">Official updates from participating ministries</div>
+          </div>
+          <a class="feed-item" href="#"><span class="src">MoA</span><div style="flex:1"><div class="meta"><span>Ministry of Agriculture</span><span>2 hrs ago</span></div><div class="ttl">PM-Kisan 19th installment disbursed to 9.6 crore wallets</div></div></a>
+          <a class="feed-item" href="#"><span class="src">MoE</span><div style="flex:1"><div class="meta"><span>Ministry of Education</span><span>5 hrs ago</span></div><div class="ttl">Vidya Lakshmi portal opens 2026–27 scholarship applications</div></div></a>
+          <a class="feed-item" href="public-ledger.html"><span class="src">LDGR</span><div style="flex:1"><div class="meta"><span>Public Ledger</span><span>1 day ago</span></div><div class="ttl">Quarterly transparency report: zero leakage across all schemes</div></div></a>
+          <a class="feed-item" href="#"><span class="src">RBI</span><div style="flex:1"><div class="meta"><span>Reserve Bank of India</span><span>2 days ago</span></div><div class="ttl">1,240 vendors added to the approved registry after ZK verification</div></div></a>
+          <div style="text-align:center;margin-top:var(--sp-4)"><a href="#" class="btn btn-secondary btn-sm">View All</a></div>
+        </div>
+
+        <div>
+          <div class="col-head">
+            <h2>Spotlight</h2><div class="uline"></div>
+            <div class="sub">How transparency is changing welfare</div>
+          </div>
+          <div class="spotlight">
+            <div class="feature">
+              <div class="ph">[ spotlight image ]</div>
+              <span class="badge badge-info" style="margin-bottom:8px">Public Ledger</span>
+              <h3>Every disbursement, publicly verifiable</h3>
+              <p>Anyone can trace a benefit from sanction to spend — without exposing a beneficiary's identity. ZK proofs keep data private while keeping the system honest.</p>
+              <a href="public-ledger.html" class="btn btn-accent btn-sm" style="margin-top:var(--sp-4)">Open the ledger →</a>
+            </div>
+            <div class="list">
+              <a class="row" href="#" style="display:block"><div class="when">June 2026</div><div class="t">e-Rupee crosses ₹2,000 Cr in welfare flows</div></a>
+              <a class="row" href="#" style="display:block"><div class="when">May 2026</div><div class="t">Vendor redemption now settles in under 24 hours</div></a>
+              <a class="row" href="#" style="display:block"><div class="when">April 2026</div><div class="t">Per-scheme ZK eligibility goes live for education &amp; housing</div></a>
+              <a class="row" href="#" style="display:block"><div class="when">March 2026</div><div class="t">Government reference registry anchored on-chain for private checks</div></a>
+              <a class="row" href="#" style="display:block"><div class="when">Feb 2026</div><div class="t">Vendor ZK-enrolment added — category-gated, per-scheme redemption</div></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Explore transparency -->
+  <section class="section container-wide">
+    <div class="head-c"><h2>Explore the System</h2><div class="uline"></div></div>
+    <div class="explore">
+      <div class="visual"><span class="cap">[ explainer image — how BharatChain works ]</span></div>
+      <div class="tiles">
+        <a class="ex-tile" href="public-ledger.html" style="text-decoration:none"><span class="ic"><svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="9" height="9" rx="1.5"/><rect x="17" y="4" width="9" height="9" rx="1.5"/><rect x="4" y="17" width="9" height="9" rx="1.5"/><rect x="17" y="17" width="9" height="9" rx="1.5"/></svg></span><div class="t">Public Ledger</div></a>
+        <a class="ex-tile" href="public-ledger.html" style="text-decoration:none"><span class="ic"><svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="10" r="4"/><path d="M4 24c0-4 3.5-6 7-6s7 2 7 6M19 9h7M19 13h5"/></svg></span><div class="t">Vendor Registry</div></a>
+        <a class="ex-tile" href="public-ledger.html" style="text-decoration:none"><span class="ic"><svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V8M11 20V4M18 20v-7M3 20h18"/></svg></span><div class="t">Money Flow</div></a>
+        <a class="ex-tile" href="public-ledger.html" style="text-decoration:none"><span class="ic"><svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6L4 15l6 9M20 6l6 9-6 9M17 4l-4 22"/></svg></span><div class="t">Open Data API</div></a>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:var(--sp-6)"><a href="#" class="btn btn-primary">Explore All</a></div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="partners">
+      <div class="container-wide">
+        <a class="partner" href="#"><span class="sq">RTI</span> Right to Information</a>
+        <a class="partner" href="#"><span class="sq">e₹</span> Digital Rupee · RBI</a>
+        <a class="partner" href="#"><span class="sq">UID</span> Aadhaar</a>
+        <a class="partner" href="#"><span class="sq">DL</span> DigiLocker</a>
+        <a class="partner" href="#"><span class="sq">DI</span> Digital India</a>
+        <a class="partner" href="#"><span class="sq">MG</span> MyGov</a>
+        <a class="partner" href="#"><span class="sq">U</span> UMANG</a>
+      </div>
+    </div>
+
+    <div class="foot-main">
+      <div class="container-wide">
+        <div>
+          <div class="brand" style="margin-bottom:var(--sp-3)">
+            <span class="emblem" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3"><circle cx="50" cy="50" r="30"/><circle cx="50" cy="50" r="6" fill="currentColor"/><line x1="50" y1="20" x2="50" y2="80"/><line x1="20" y1="50" x2="80" y2="50"/><line x1="29" y1="29" x2="71" y2="71"/><line x1="71" y1="29" x2="29" y2="71"/></svg></span>
+            <div><div class="wm">Bharat<span style="color:var(--saffron)">Chain</span></div><div class="motto">सत्यमेव जयते</div></div>
+          </div>
+          <p style="color:#7e93b4;font-size:var(--t-sm);max-width:32ch">Anti-corruption welfare distribution on a public, auditable ledger. A Digital India initiative.</p>
+        </div>
+        <div><h4>Schemes</h4><a href="#">Agriculture &amp; Rural</a><a href="#">Education</a><a href="#">Housing</a><a href="#">Health</a><a href="#">All sectors</a></div>
+        <div><h4>Citizens</h4><a href="#">Apply for a scheme</a><a href="#">Track application</a><a href="#">My e-Rupee wallet</a><a href="#">Eligibility check</a><a href="#">Help &amp; support</a></div>
+        <div><h4>Transparency</h4><a href="public-ledger.html">Public ledger</a><a href="public-ledger.html">Money flow</a><a href="#">Vendor registry</a><a href="#">Open data API</a><a href="#">Visitor summary</a></div>
+        <div>
+          <h4>View on Mobile</h4>
+          <div class="qr" aria-hidden="true"></div>
+          <h4 style="margin-top:var(--sp-4)">About</h4>
+          <a href="#">Contact us</a><a href="#">Website policy</a><a href="#">Disclaimer</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <div class="container-wide">
+        <div class="tag">Translation Disclaimer</div>
+        <p>Translations of content into languages other than English are generated using automated tools and may not always be accurate. They are provided for informational purposes only and should not be considered authoritative.</p>
+      </div>
+    </div>
+
+    <div class="credit">
+      <div class="container-wide">
+        <span class="nic">NIC</span>
+        <p>BharatChain is developed under the Digital India Programme to give citizens transparent access to welfare benefits. It is designed, developed and maintained by the National Informatics Centre (NIC), under the Ministry of Electronics &amp; Information Technology, Government of India. © 2026 BharatChain · All rights reserved.</p>
+      </div>
+    </div>
+
+    <!-- Developer credits -->
+    <div class="devs">
+      <div class="container-wide">
+        <div class="lead">Built by</div>
+        <div class="grid-devs">
+          <div class="dev"><span class="av" style="background:var(--navy-700)">DV</span><span class="nm">Developer Name</span><span class="role">Blockchain</span></div>
+          <div class="dev"><span class="av" style="background:var(--navy-700)">DV</span><span class="nm">Developer Name</span><span class="role">Blockchain</span></div>
+          <div class="dev"><span class="av" style="background:var(--green-600)">DV</span><span class="nm">Developer Name</span><span class="role">Full-stack</span></div>
+          <div class="dev"><span class="av" style="background:var(--saffron-600)">DV</span><span class="nm">Developer Name</span><span class="role">Frontend</span></div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Side rail -->
+  <div class="rail" aria-label="Quick tools">
+    <button title="Feedback"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h12v9H8l-4 3z"/></svg></button>
+    <button title="Calendar"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="3.5" width="13" height="12" rx="2"/><path d="M2.5 7h13M6 2v3M12 2v3"/></svg></button>
+    <button title="Share"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="9" r="2.4"/><circle cx="14" cy="4" r="2.4"/><circle cx="14" cy="14" r="2.4"/><path d="M7 8l5-3M7 10l5 3"/></svg></button>
+    <button title="Theme"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="7"/><path d="M9 2v14"/></svg></button>
+  </div>
+
+  <!-- Back to top -->
+  <button class="totop" id="totop" title="Back to top" aria-label="Back to top">↑</button>
+
+  <!-- AI assistant -->
+  <button class="ai-fab" id="aiFab">
+    <span class="orb" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="#fff"><path d="M9 1.5l1.4 3.4 3.4 1.4-3.4 1.4L9 11.1 7.6 7.7 4.2 6.3l3.4-1.4z"/><circle cx="13.5" cy="13" r="1.6"/></svg></span>
+    <span class="txt">Ask BharatChain AI</span>
+    <span class="pulse" aria-hidden="true"></span>
+  </button>
+
+  <!-- AI chat panel -->
+  <div class="ai-panel" id="aiPanel" hidden>
+    <div class="ai-head">
+      <div class="who">
+        <span class="orb" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="#fff"><path d="M9 1.5l1.4 3.4 3.4 1.4-3.4 1.4L9 11.1 7.6 7.7 4.2 6.3l3.4-1.4z"/><circle cx="13.5" cy="13" r="1.6"/></svg></span>
+        <div><div class="t">BharatChain AI</div><div class="s">Schemes · eligibility · status</div></div>
+      </div>
+      <button class="ai-close" id="aiClose" aria-label="Close">×</button>
+    </div>
+    <div class="ai-body" id="aiBody"></div>
+    <div class="ai-sugs" id="aiSugs"></div>
+    <form class="ai-input" id="aiForm">
+      <input id="aiText" placeholder="Ask about a scheme…" autocomplete="off" />
+      <button type="submit" aria-label="Send">↑</button>
+    </form>
+  </div>
+
+  <script>
+    /* ============================================================
+       HERO SLIDESHOW
+       Add your background image URLs here (relative or absolute).
+       Leave the array empty to keep the branded gradient slides.
+       Example: const HERO_SLIDES = ["../uploads/hero1.jpg", "../uploads/hero2.jpg"];
+       ============================================================ */
+    const HERO_SLIDES = [];
+
+    (function heroShow() {
+      const wrap = document.getElementById('heroSlides');
+      const dotsBox = document.getElementById('heroDots');
+      let slides;
+
+      if (HERO_SLIDES.length) {
+        wrap.innerHTML = '';
+        slides = HERO_SLIDES.map((src, i) => {
+          const d = document.createElement('div');
+          d.className = 'slide' + (i === 0 ? ' on' : '');
+          d.style.backgroundImage = `url("${src}")`;
+          wrap.appendChild(d);
+          return d;
+        });
+      } else {
+        slides = Array.from(wrap.querySelectorAll('.slide'));
+      }
+
+      slides.forEach((_, i) => {
+        const b = document.createElement('button');
+        if (i === 0) b.className = 'on';
+        b.addEventListener('click', () => go(i));
+        dotsBox.appendChild(b);
+      });
+      const dots = Array.from(dotsBox.children);
+
+      let cur = 0, timer;
+      function go(n) {
+        slides[cur].classList.remove('on'); dots[cur].classList.remove('on');
+        cur = (n + slides.length) % slides.length;
+        slides[cur].classList.add('on'); dots[cur].classList.add('on');
+        restart();
+      }
+      function restart() { clearInterval(timer); if (slides.length > 1) timer = setInterval(() => go(cur + 1), 5500); }
+      restart();
+    })();
+
+    /* Carousel arrows */
+    document.querySelectorAll('.caro-nav').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const track = document.getElementById(btn.dataset.caro);
+        track.scrollBy({ left: btn.classList.contains('next') ? 250 : -250, behavior: 'smooth' });
+      });
+    });
+
+    /* Back to top */
+    const totop = document.getElementById('totop');
+    window.addEventListener('scroll', () => totop.classList.toggle('show', window.scrollY > 600));
+    totop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    /* Count-up stats */
+    function animateCount(el) {
+      const to = parseFloat(el.dataset.to || '0');
+      const dec = parseInt(el.dataset.decimals || '0', 10);
+      const comma = 'comma' in el.dataset;
+      const pre = el.dataset.prefix || '', suf = el.dataset.suffix || '';
+      const fmt = v => {
+        const n = dec ? +v.toFixed(dec) : Math.round(v);
+        const body = (comma || !dec) ? n.toLocaleString('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec }) : n.toFixed(dec);
+        return pre + body + suf;
+      };
+      const dur = 1400, start = performance.now();
+      (function step(now) {
+        const p = Math.min(1, (now - start) / dur);
+        el.textContent = fmt(to * (1 - Math.pow(1 - p, 3)));
+        if (p < 1) requestAnimationFrame(step); else el.textContent = fmt(to);
+      })(start);
+    }
+
+    /* Scroll-reveal + counter triggers */
+    const revealIO = new IntersectionObserver((es) => {
+      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); } });
+    }, { threshold: .12 });
+    document.querySelectorAll('.section, .stats-wrap').forEach(s => { s.classList.add('reveal'); revealIO.observe(s); });
+
+    const statIO = new IntersectionObserver((es) => {
+      es.forEach(e => { if (e.isIntersecting) { e.target.querySelectorAll('.num[data-to]').forEach(animateCount); statIO.unobserve(e.target); } });
+    }, { threshold: .3 });
+    document.querySelectorAll('.stats-card').forEach(c => statIO.observe(c));
+
+    /* Live ledger ticker */
+    (function ticker() {
+      const track = document.getElementById('tickerTrack');
+      if (!track) return;
+      const schemes = ['PM-Kisan', 'Vidya Lakshmi', 'PM Awas'];
+      const amts = [10000, 50000, 50000];
+      const hex = () => Math.random().toString(16).slice(2, 6);
+      const items = [];
+      for (let i = 0; i < 9; i++) {
+        const id = '0x' + hex() + '…' + hex();
+        const amt = amts[i % amts.length].toLocaleString('en-IN');
+        items.push(`<span class="tx"><b>${id}</b> · ₹${amt} · ${schemes[i % schemes.length]} · <span class="ok">✓ verified</span></span>`);
+      }
+      track.innerHTML = items.join('') + items.join(''); /* duplicate for seamless loop */
+    })();
+
+    /* AI assistant chat panel */
+    const aiFab = document.getElementById('aiFab'), aiPanel = document.getElementById('aiPanel'),
+          aiBody = document.getElementById('aiBody'), aiForm = document.getElementById('aiForm'),
+          aiText = document.getElementById('aiText'), aiSugs = document.getElementById('aiSugs');
+    const SUGS = ['Am I eligible for PM-Kisan?', 'How does e-Rupee work?', 'Track my application', 'What is the public ledger?'];
+    const KB = [
+      { k: ['pm-kisan', 'kisan', 'farmer', 'agricult'], a: 'PM-Kisan Samman Nidhi pays ₹10,000 per installment, 3× a year, straight to your e-Rupee wallet — for farmers & landholders. Want me to run an eligibility check?' },
+      { k: ['scholar', 'vidya', 'educat', 'student'], a: 'Vidya Lakshmi Scholarship gives ₹50,000 per installment (2× a year). Eligibility is checked privately via a zero-knowledge proof against several criteria — income is one of them. I can start an application for you.' },
+      { k: ['housing', 'awas', 'house', 'home'], a: 'PM Awas Yojana provides ₹50,000 per installment, 3× a year, for eligible households. Eligibility is verified privately with a zero-knowledge proof against the scheme criteria.' },
+      { k: ['eligib', 'qualify', 'check'], a: 'Eligibility is checked with a zero-knowledge proof against the government registry — your documents never leave your control. Tell me a scheme and your sector and I’ll guide you.' },
+      { k: ['status', 'track', 'applicat'], a: 'You can follow any application under “Track Application”. Share your reference ID and I’ll fetch the latest on-chain status.' },
+      { k: ['wallet', 'e-rupee', 'erupee', 'rupee', 'payment', 'money'], a: 'Benefits are disbursed as digital rupee (e-Rupee) directly to your wallet on schedule. You can spend only at approved vendors, and every transaction is recorded on the public ledger.' },
+      { k: ['vendor', 'redeem', 'shop', 'merchant'], a: 'Approved vendors accept e-Rupee and redeem to fiat after delivery is confirmed — there are 12,480+ vendors in the registry today.' },
+      { k: ['ledger', 'transparen', 'audit', 'chain', 'blockchain'], a: 'Every disbursement — from sanction to spend — is recorded on a public, auditable ledger. Identities stay private via ZK proofs while the money flow stays verifiable by anyone.' }
+    ];
+    function canned(q) {
+      const t = q.toLowerCase();
+      for (const e of KB) if (e.k.some(k => t.includes(k))) return e.a;
+      return 'I can help with schemes (PM-Kisan, Vidya Lakshmi, PM Awas), eligibility checks, your e-Rupee wallet, vendor redemption, and tracking applications. What would you like to know?';
+    }
+    async function answer(q) {
+      if (window.claude && window.claude.complete) {
+        try { return (await window.claude.complete("You are BharatChain's assistant for a transparent, on-chain government welfare portal (schemes, zero-knowledge eligibility, e-Rupee wallet, approved vendors, public ledger). Reply in 1–3 short sentences, helpful and plain. User: " + q)).trim(); } catch (e) {}
+      }
+      return canned(q);
+    }
+    function bubble(text, who) { const d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text; aiBody.appendChild(d); aiBody.scrollTop = aiBody.scrollHeight; return d; }
+    function renderSugs() { aiSugs.innerHTML = ''; SUGS.forEach(s => { const b = document.createElement('button'); b.textContent = s; b.onclick = () => send(s); aiSugs.appendChild(b); }); }
+    async function send(q) {
+      q = (q || '').trim(); if (!q) return;
+      bubble(q, 'me'); aiText.value = '';
+      const t = bubble('typing…', 'bot typing');
+      const a = await answer(q);
+      t.remove(); bubble(a, 'bot');
+    }
+    let greeted = false;
+    function openPanel() {
+      aiPanel.hidden = false;
+      if (!greeted) { greeted = true; bubble('Namaste — I’m the BharatChain assistant. Ask me about schemes, eligibility, your e-Rupee wallet, or tracking an application.', 'bot'); renderSugs(); }
+      aiText.focus();
+    }
+    aiFab.addEventListener('click', () => { aiPanel.hidden ? openPanel() : (aiPanel.hidden = true); });
+    document.getElementById('aiClose').addEventListener('click', () => { aiPanel.hidden = true; });
+    aiForm.addEventListener('submit', e => { e.preventDefault(); send(aiText.value); });
+  </script>
+</body>
+</html>

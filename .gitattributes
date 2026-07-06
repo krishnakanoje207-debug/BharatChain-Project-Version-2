@@ -1,0 +1,12 @@
+# Normalize line endings to LF across platforms (keeps CI on Linux clean).
+* text=auto eol=lf
+
+# Treat these as binary (no EOL/diff munging).
+*.png binary
+*.jpg binary
+*.docx binary
+*.pdf binary
+*.ptau binary
+*.zkey binary
+*.wasm binary
+*.r1cs binary

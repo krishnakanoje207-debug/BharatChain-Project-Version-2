@@ -1,0 +1,20 @@
+{
+  "name": "@bharatchain/circuits",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BharatChain zero-knowledge circuits (Circom + snarkjs)",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"(circuits: run 'npm run zk:build' — needs the circom binary)\" && exit 0",
+    "zk:build": "node scripts/build.mjs",
+    "zk:tree-check": "node scripts/treeCheck.mjs",
+    "lint": "echo \"(circuits lint: TBD)\" && exit 0"
+  },
+  "dependencies": {
+    "circomlibjs": "^0.1.7",
+    "snarkjs": "^0.7.4"
+  },
+  "devDependencies": {
+    "circomlib": "^2.0.5"
+  }
+}

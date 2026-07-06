@@ -1,0 +1,19 @@
+{
+  "name": "@bharatchain/indexer",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The Graph subgraph for BharatChain (public on-chain welfare ledger)",
+  "scripts": {
+    "build": "echo \"(indexer: run 'npm run subgraph:deploy -w @bharatchain/indexer' against a running stack)\" && exit 0",
+    "gen:config": "node scripts/gen-config.mjs",
+    "codegen": "npm run gen:config && graph codegen",
+    "subgraph:build": "npm run codegen && graph build --network hardhat",
+    "subgraph:create": "graph create bharatchain/welfare --node http://localhost:8020/",
+    "subgraph:deploy": "npm run subgraph:build && (graph create bharatchain/welfare --node http://localhost:8020/ || echo already-created) && graph deploy bharatchain/welfare --node http://localhost:8020/ --ipfs http://localhost:5001/ --version-label v0.0.1",
+    "lint": "echo \"(indexer lint: TBD)\" && exit 0"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.97.1",
+    "@graphprotocol/graph-ts": "0.38.1"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "bharatchain",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BharatChain — blockchain anti-corruption welfare-distribution system",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "contracts:compile": "npm run compile -w @bharatchain/contracts",
+    "contracts:test": "npm run test -w @bharatchain/contracts",
+    "contracts:node": "npm run node -w @bharatchain/contracts",
+    "backend:dev": "npm run start:dev -w @bharatchain/backend",
+    "infra:up": "docker compose -f infra/docker-compose.yml up -d",
+    "infra:down": "docker compose -f infra/docker-compose.yml down",
+    "infra:logs": "docker compose -f infra/docker-compose.yml logs -f"
+  }
+}

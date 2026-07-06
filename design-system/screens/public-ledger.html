@@ -1,0 +1,221 @@
+<!-- @dsCard group="Screens" name="Public Ledger" subtitle="Public transparency explorer — money-flow, per-scheme funds, live on-chain activity (PII-free)" -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BharatChain — Public Ledger</title>
+  <link rel="stylesheet" href="../styles/theme.css" />
+  <link rel="stylesheet" href="../styles/app.css" />
+  <style>
+    /* Screen-local chrome — public page (no auth shell). Tokens from theme.css. */
+    .container-wide { width: 100%; max-width: 1320px; margin: 0 auto; padding: 0 var(--sp-5); }
+
+    .util { background: var(--navy-900); color: #c9d6ea; font-size: var(--t-xs); }
+    .util .container-wide { display: flex; align-items: center; justify-content: space-between; height: 34px; }
+    .util .a11y { display: flex; align-items: center; gap: 12px; }
+    .util .a11y button { background: none; border: 0; color: #c9d6ea; cursor: pointer; font: inherit; padding: 2px 5px; border-radius: 4px; }
+    .util .a11y .on { background: rgba(255,255,255,.15); color: #fff; } .util .sep { opacity: .35; }
+
+    .masthead { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
+    .masthead .container-wide { display: flex; align-items: center; gap: var(--sp-4); height: 72px; }
+    .brand { display: flex; align-items: center; gap: var(--sp-3); flex: none; }
+    .brand .wm { font-weight: 800; font-size: 1.3rem; letter-spacing: -.02em; color: var(--navy); line-height: 1; }
+    .brand .wm .chain { color: var(--saffron-600); }
+    .brand .motto { font-family: var(--font-serif); font-size: .66rem; color: var(--ink-3); margin-top: 3px; }
+    .nav { display: flex; gap: var(--sp-5); margin-left: var(--sp-5); }
+    .nav a { color: var(--ink-2); font-weight: 500; font-size: var(--t-sm); padding: 6px 0; position: relative; }
+    .nav a:hover { color: var(--navy); text-decoration: none; }
+    .nav a.active { color: var(--navy); }
+    .nav a.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; background: var(--saffron); border-radius: 2px; }
+    .masthead .actions { margin-left: auto; display: flex; align-items: center; gap: var(--sp-3); }
+
+    .lhero { background:
+        radial-gradient(900px 420px at 78% -20%, rgba(19,136,8,.22), transparent 60%),
+        linear-gradient(180deg, var(--navy) 0%, var(--navy-900) 100%); color: #eaf1fb; }
+    .lhero .container-wide { padding: var(--sp-8) var(--sp-5); }
+    .lhero h1 { color: #fff; max-width: 18ch; }
+    .lhero .sub { margin-top: var(--sp-3); font-size: var(--t-lg); color: #b9cae3; max-width: 64ch; }
+    .lhero .meta { margin-top: var(--sp-5); display: flex; flex-wrap: wrap; gap: var(--sp-5); }
+    .lhero .meta .m { display: flex; align-items: center; gap: 9px; font-size: var(--t-sm); color: #cfe0f6; }
+    .lhero .meta .m .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(19,136,8,.22); }
+
+    .stats-wrap { margin-top: calc(-1 * var(--sp-6)); position: relative; z-index: 5; }
+    .stats-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--sh-lg); border: 1px solid var(--border);
+      display: grid; grid-template-columns: repeat(5, 1fr); }
+    .stat-cell { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-5); border-right: 1px solid var(--border); }
+    .stat-cell:last-child { border-right: 0; }
+    .stat-cell .ic { width: 44px; height: 44px; flex: none; border-radius: var(--r-md); display: grid; place-items: center; background: var(--info-bg); color: var(--info-fg); }
+    .stat-cell .num { font-size: var(--t-2xl); font-weight: 800; color: var(--navy); line-height: 1; letter-spacing: -.02em; }
+    .stat-cell .lbl { font-size: var(--t-xs); color: var(--ink-2); margin-top: 4px; line-height: 1.25; }
+
+    .privacy { display: flex; gap: var(--sp-4); align-items: flex-start; background: var(--info-bg); border: 1px solid #cfe0fb; border-radius: var(--r-lg); padding: var(--sp-5); }
+    .privacy .ic { width: 42px; height: 42px; flex: none; border-radius: var(--r-md); display: grid; place-items: center; background: #fff; color: var(--info-fg); }
+    .privacy h3 { font-size: var(--t-base); } .privacy p { font-size: var(--t-sm); margin-top: 4px; }
+
+    footer { background: #050f1f; color: #aabbd4; }
+    footer .container-wide { padding: var(--sp-7) var(--sp-5) var(--sp-5); }
+    footer .cols { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sp-6); }
+    footer h4 { color: #fff; font-size: var(--t-sm); text-transform: uppercase; letter-spacing: .06em; margin-bottom: var(--sp-3); }
+    footer a { display: block; color: #aabbd4; font-size: var(--t-sm); padding: 5px 0; } footer a:hover { color: #fff; }
+    footer .bottom { margin-top: var(--sp-6); padding-top: var(--sp-5); border-top: 1px solid rgba(255,255,255,.1); display: flex; justify-content: space-between; gap: var(--sp-4); font-size: var(--t-xs); color: #7e93b4; flex-wrap: wrap; }
+    @media (max-width: 1080px) { .stats-card { grid-template-columns: repeat(3,1fr); } .stat-cell:nth-child(3n){border-right:0} }
+    @media (max-width: 860px) { .nav { display: none; } .stats-card { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <hr class="tricolor" />
+
+  <!-- Utility strip -->
+  <div class="util">
+    <div class="container-wide">
+      <span>भारत सरकार &nbsp;<span class="sep">|</span>&nbsp; Government of India · A Digital India Initiative</span>
+      <div class="a11y">
+        <span>Text size</span>
+        <button title="Decrease">A−</button><button class="on" title="Normal">A</button><button title="Increase">A+</button>
+        <span class="sep">|</span><button title="High contrast">◐ Contrast</button>
+        <span class="sep">|</span><button class="on">EN</button><button>हिं</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Masthead -->
+  <header class="masthead">
+    <div class="container-wide">
+      <a href="public-home.html" class="brand" style="text-decoration:none">
+        <span class="emblem" aria-hidden="true">
+          <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3">
+            <circle cx="50" cy="50" r="30" /><circle cx="50" cy="50" r="6" fill="currentColor" />
+            <line x1="50" y1="20" x2="50" y2="80" /><line x1="20" y1="50" x2="80" y2="50" />
+            <line x1="29" y1="29" x2="71" y2="71" /><line x1="71" y1="29" x2="29" y2="71" />
+          </svg>
+        </span>
+        <div><div class="wm">Bharat<span class="chain">Chain</span></div><div class="motto">सत्यमेव जयते</div></div>
+      </a>
+      <nav class="nav">
+        <a href="public-home.html">Home</a>
+        <a href="public-home.html">Schemes</a>
+        <a href="#">Track Application</a>
+        <a href="public-ledger.html" class="active">Public Ledger</a>
+        <a href="#">Help</a>
+      </nav>
+      <div class="actions">
+        <a href="#" class="btn btn-ghost btn-sm">Vendor sign-up</a>
+        <a href="#" class="btn btn-primary btn-sm">Sign in</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="lhero">
+    <div class="container-wide">
+      <span class="eyebrow" style="color:#9fd69a">Transparency</span>
+      <h1 style="margin-top:10px">The public ledger — every rupee, auditable</h1>
+      <p class="sub">Welfare e-Rupee is issued, disbursed, spent and redeemed entirely on a public, tamper-evident
+        chain. Anyone can verify the flow of funds. <strong>No personal data is ever published</strong> — citizens and
+        vendors appear only as zero-knowledge commitments.</p>
+      <div class="meta">
+        <span class="m"><span class="dot"></span> Live · finalized on-chain</span>
+        <span class="m">Indexed by The Graph · open read API</span>
+        <span class="m">Updated every block</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Aggregate stats -->
+  <div class="stats-wrap">
+    <div class="container-wide">
+      <div class="stats-card">
+        <div class="stat-cell"><span class="ic">₹</span><div><div class="num">₹2,340 Cr</div><div class="lbl">Disbursed to wallets</div></div></div>
+        <div class="stat-cell"><span class="ic">◎</span><div><div class="num">4.6 L</div><div class="lbl">Beneficiaries enrolled</div></div></div>
+        <div class="stat-cell"><span class="ic">▦</span><div><div class="num">12,480</div><div class="lbl">Approved vendors</div></div></div>
+        <div class="stat-cell"><span class="ic">↻</span><div><div class="num">₹780 Cr</div><div class="lbl">Redeemed to fiat</div></div></div>
+        <div class="stat-cell"><span class="ic">✓</span><div><div class="num">0</div><div class="lbl">Leakage — audited on-chain</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Money flow + per-scheme funds -->
+  <section class="section container-wide" style="padding-top:var(--sp-7)">
+    <div class="row-wide">
+      <div class="panel">
+        <div class="panel-h"><h3>Money flow — issued → redeemed</h3><span class="badge badge-info">Reconciled 1:1 on-chain</span></div>
+        <div class="panel-b">
+          <div class="bar-row"><span class="lab">Issued to schemes</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="val">₹3.1K</span></div>
+          <div class="bar-row"><span class="lab">Disbursed to wallets</span><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><span class="val">₹2.3K</span></div>
+          <div class="bar-row"><span class="lab">Spent at vendors</span><div class="bar-track"><div class="bar-fill s" style="width:50%"></div></div><span class="val">₹1.5K</span></div>
+          <div class="bar-row"><span class="lab">Redeemed to fiat</span><div class="bar-track"><div class="bar-fill g" style="width:25%"></div></div><span class="val">₹780</span></div>
+          <p class="caption" style="margin-top:var(--sp-4)">Figures in ₹ Cr. Every minted e-Rupee is backed 1:1 and traceable from issuance to redemption.
+            A token can only move issuer → wallet → approved vendor → redemption — never peer-to-peer.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><h3>Scheme funds</h3></div>
+        <div class="panel-b flush">
+          <table class="tbl">
+            <thead><tr><th>Scheme</th><th>Sector</th><th class="right">Disbursed / Fund</th></tr></thead>
+            <tbody>
+              <tr><td>PM-Kisan Samman Nidhi</td><td><span class="badge badge-info">Agriculture</span></td><td class="right amt">₹1,150 / 10,000 Cr</td></tr>
+              <tr><td>Vidya Lakshmi Scholarship</td><td><span class="badge badge-info">Education</span></td><td class="right amt">₹740 / 5,000 Cr</td></tr>
+              <tr><td>PM Awas Yojana</td><td><span class="badge badge-info">Housing</span></td><td class="right amt">₹450 / 8,000 Cr</td></tr>
+            </tbody>
+          </table>
+          <div style="padding:var(--sp-4) var(--sp-5);border-top:1px solid var(--border)">
+            <span class="caption">Each scheme runs on its own on-chain ledger — approved-beneficiary set, approved-vendor set and spent-nullifiers, all keyed to the scheme.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live activity -->
+    <div class="panel">
+      <div class="panel-h"><h3>Live on-chain activity</h3><span class="badge badge-ok"><span class="dot"></span> No personal data — commitments only</span></div>
+      <div class="panel-b flush">
+        <table class="tbl">
+          <thead><tr><th>Time</th><th>Event</th><th>Scheme</th><th class="right">Amount</th><th>On-chain ref</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>just now</td><td>Disbursal (installment)</td><td><span class="badge badge-info">PM-Kisan</span></td><td class="right amt">₹10,000</td><td class="mono">0x9f3a…b21e</td><td><span class="badge badge-ok"><span class="dot"></span> Finalized</span></td></tr>
+            <tr><td>1 min ago</td><td>Payment → vendor</td><td><span class="badge badge-info">PM Awas</span></td><td class="right amt">₹4,200</td><td class="mono">0x71c8…44df</td><td><span class="badge badge-ok"><span class="dot"></span> Delivered</span></td></tr>
+            <tr><td>3 min ago</td><td>Redemption (burn + payout)</td><td><span class="badge badge-info">Vidya Lakshmi</span></td><td class="right amt">₹68,000</td><td class="mono">0x2ab0…9e77</td><td><span class="badge badge-ok"><span class="dot"></span> Settled</span></td></tr>
+            <tr><td>4 min ago</td><td>Enrolment (ZK proof)</td><td><span class="badge badge-info">PM-Kisan</span></td><td class="right">—</td><td class="mono">0x55d1…0c3a</td><td><span class="badge badge-ok"><span class="dot"></span> Verified</span></td></tr>
+            <tr><td>6 min ago</td><td>Vendor approved</td><td><span class="badge">Agri-input</span></td><td class="right">—</td><td class="mono">0xc40a…7b15</td><td><span class="badge badge-ok"><span class="dot"></span> On registry</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Privacy note -->
+    <div class="privacy" style="margin-top:var(--sp-5)">
+      <span class="ic"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 2l7 3v5c0 4.5-3 7-7 9-4-2-7-4.5-7-9V5z"/><path d="M8 11l2.2 2.2L15 8.5"/></svg></span>
+      <div>
+        <h3>Transparent by design, private by default</h3>
+        <p>Eligibility is proven with a zero-knowledge proof against the government registry, so amounts and flows are
+          public and verifiable while names, PAN, income and documents never touch the chain. This ledger is read-only and
+          carries no personally identifiable information.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container-wide">
+      <div class="cols">
+        <div style="max-width:34ch">
+          <div class="brand" style="margin-bottom:12px">
+            <span class="emblem" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3"><circle cx="50" cy="50" r="30"/><circle cx="50" cy="50" r="6" fill="currentColor"/><line x1="50" y1="20" x2="50" y2="80"/><line x1="20" y1="50" x2="80" y2="50"/><line x1="29" y1="29" x2="71" y2="71"/><line x1="71" y1="29" x2="29" y2="71"/></svg></span>
+            <div><div class="wm" style="color:#fff;font-weight:800">Bharat<span style="color:var(--saffron)">Chain</span></div><div class="motto" style="color:#7e93b4">सत्यमेव जयते</div></div>
+          </div>
+          <p style="color:#8ea6c8;font-size:var(--t-sm)">Anti-corruption welfare distribution on a public, auditable ledger.</p>
+        </div>
+        <div><h4>Ledger</h4><a href="#">Money flow</a><a href="#">Scheme funds</a><a href="#">Live activity</a><a href="#">Open read API</a></div>
+        <div><h4>Schemes</h4><a href="public-home.html">Agriculture</a><a href="public-home.html">Education</a><a href="public-home.html">Housing</a></div>
+        <div><h4>About</h4><a href="public-home.html">How it works</a><a href="#">Privacy &amp; ZK</a><a href="#">Help</a></div>
+      </div>
+      <div class="bottom">
+        <span>© 2026 BharatChain · Government of India</span>
+        <span>Records are commitments only · no PII is ever published</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

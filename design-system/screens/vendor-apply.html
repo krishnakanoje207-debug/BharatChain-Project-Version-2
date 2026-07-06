@@ -1,0 +1,146 @@
+<!-- @dsCard group="Screens" name="Vendor Sign-up & Verification" subtitle="Vendor self-registration — apply for one product category, admin verifies genuineness, then ZK-enrolment" -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BharatChain — Vendor Sign-up</title>
+  <link rel="stylesheet" href="../styles/theme.css" />
+  <style>
+    .container { max-width: 1100px; }
+    .util { background: var(--navy-900); color: #c9d6ea; font-size: var(--t-xs); }
+    .util .container { display: flex; align-items: center; justify-content: space-between; height: 34px; }
+    .masthead { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 40; }
+    .masthead .container { display: flex; align-items: center; gap: var(--sp-4); height: 70px; }
+    .brand { display: flex; align-items: center; gap: var(--sp-3); }
+    .brand .wm { font-weight: 800; font-size: 1.3rem; color: var(--navy); line-height: 1; } .brand .wm .chain { color: var(--saffron-600); }
+    .brand .motto { font-family: var(--font-serif); font-size: .66rem; color: var(--ink-3); margin-top: 3px; }
+    .masthead .actions { margin-left: auto; display: flex; gap: var(--sp-3); }
+
+    .layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--sp-6); align-items: start; }
+    .formcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); box-shadow: var(--sh-sm); overflow: hidden; }
+    .formcard .hd { padding: var(--sp-5); border-bottom: 1px solid var(--border); }
+    .formcard .bd { padding: var(--sp-5); }
+    .stepper { display: flex; gap: var(--sp-2); margin-bottom: var(--sp-5); }
+    .stepper .s { flex: 1; font-size: var(--t-xs); color: var(--ink-3); padding-top: 10px; border-top: 3px solid var(--border); font-weight: 600; }
+    .stepper .s.on { color: var(--navy); border-top-color: var(--saffron); }
+    .stepper .s.done { color: var(--green-600); border-top-color: var(--green); }
+    .label { display: block; font-size: var(--t-sm); font-weight: 600; color: var(--ink-2); margin: 0 0 6px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-4); }
+    .fieldgrp { margin-bottom: var(--sp-4); }
+    select.field { appearance: none; background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%236b7a92' stroke-width='2'%3E%3Cpath d='M3 5l4 4 4-4'/%3E%3C/svg%3E") right 14px center no-repeat; }
+    .cat-pick { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+    .cat-opt { border: 1px solid var(--border-strong); border-radius: var(--r-md); padding: var(--sp-4); cursor: pointer; transition: border-color .15s, background .15s; }
+    .cat-opt:hover { border-color: var(--navy); }
+    .cat-opt.sel { border-color: var(--navy); background: var(--info-bg); box-shadow: inset 0 0 0 1px var(--navy); }
+    .cat-opt .nm { font-weight: 700; font-size: var(--t-sm); } .cat-opt .d { font-size: var(--t-xs); color: var(--ink-3); margin-top: 3px; }
+    .drop { border: 1.5px dashed var(--border-strong); border-radius: var(--r-md); padding: var(--sp-5); text-align: center; color: var(--ink-3); font-size: var(--t-sm); }
+
+    .aside-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--sp-5); box-shadow: var(--sh-sm); }
+    .flow { position: relative; margin-top: var(--sp-3); }
+    .flow .step { display: flex; gap: var(--sp-3); padding-bottom: var(--sp-4); position: relative; }
+    .flow .step:last-child { padding-bottom: 0; }
+    .flow .step .n { width: 30px; height: 30px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: var(--t-sm); flex: none; z-index: 2; }
+    .flow .step .n.saff { background: var(--saffron); color: #3a2200; }
+    .flow .step::before { content: ""; position: absolute; left: 14px; top: 30px; bottom: 0; width: 2px; background: var(--border); }
+    .flow .step:last-child::before { display: none; }
+    .flow .step .t { font-weight: 600; font-size: var(--t-sm); } .flow .step .d { font-size: var(--t-xs); color: var(--ink-3); margin-top: 2px; }
+    @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } .grid2, .cat-pick { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <hr class="tricolor" />
+  <div class="util"><div class="container"><span>भारत सरकार &nbsp;|&nbsp; Government of India</span><span>Vendor onboarding</span></div></div>
+  <header class="masthead">
+    <div class="container">
+      <a href="public-home.html" class="brand" style="text-decoration:none">
+        <span class="emblem" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="3"><circle cx="50" cy="50" r="30"/><circle cx="50" cy="50" r="6" fill="currentColor"/><line x1="50" y1="20" x2="50" y2="80"/><line x1="20" y1="50" x2="80" y2="50"/><line x1="29" y1="29" x2="71" y2="71"/><line x1="71" y1="29" x2="29" y2="71"/></svg></span>
+        <div><div class="wm">Bharat<span class="chain">Chain</span></div><div class="motto">सत्यमेव जयते</div></div>
+      </a>
+      <div class="actions"><a href="#" class="btn btn-ghost btn-sm">Already a vendor? Sign in</a></div>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head" style="max-width:680px">
+        <span class="eyebrow">Vendor sign-up</span>
+        <h2 style="margin-top:10px">Become an approved vendor</h2>
+        <p>Register your business and apply to accept welfare e-Rupee for <strong>one product category</strong>. A system
+          administrator verifies that your business is genuine; once approved, you're ZK-enrolled for the schemes your
+          category serves and can start accepting payments.</p>
+      </div>
+
+      <div class="layout">
+        <!-- Application form -->
+        <div class="formcard">
+          <div class="hd">
+            <div class="stepper">
+              <div class="s done">1 · Account</div>
+              <div class="s on">2 · Business &amp; category</div>
+              <div class="s">3 · Licence proof</div>
+              <div class="s">4 · Review</div>
+            </div>
+            <h3>Business details &amp; category</h3>
+            <p class="caption" style="margin-top:4px">All fields are checked against the official business registry during verification.</p>
+          </div>
+          <div class="bd">
+            <div class="grid2">
+              <div class="fieldgrp"><label class="label">Registered business name</label><input class="field" value="Krishi Seva Kendra" /></div>
+              <div class="fieldgrp"><label class="label">GSTIN</label><input class="field" placeholder="22ABCDE1234F1Z5" /></div>
+            </div>
+            <div class="grid2">
+              <div class="fieldgrp"><label class="label">Business-registry ID</label><input class="field" placeholder="UDYAM-MP-00-0000000" /></div>
+              <div class="fieldgrp"><label class="label">Proprietor / authorised signatory</label><input class="field" placeholder="Full name" /></div>
+            </div>
+            <div class="grid2">
+              <div class="fieldgrp"><label class="label">City</label><input class="field" value="Bhopal" /></div>
+              <div class="fieldgrp"><label class="label">State</label><input class="field" value="Madhya Pradesh" /></div>
+            </div>
+
+            <div class="fieldgrp">
+              <label class="label">Product category — choose one</label>
+              <div class="cat-pick">
+                <div class="cat-opt sel"><div class="nm">Agri-input</div><div class="d">Seeds, fertiliser, farm equipment</div></div>
+                <div class="cat-opt"><div class="nm">Educational institution</div><div class="d">Schools, colleges, universities</div></div>
+                <div class="cat-opt"><div class="nm">Technology store</div><div class="d">Computers &amp; devices for students</div></div>
+                <div class="cat-opt"><div class="nm">Housing material</div><div class="d">Cement, steel, building supplies</div></div>
+              </div>
+              <p class="caption" style="margin-top:8px">Your category determines which schemes you can serve — e.g. Agri-input serves PM-Kisan. You're enrolled for every active scheme that allows your category.</p>
+            </div>
+
+            <div class="fieldgrp">
+              <label class="label">Trade licence / registration proof</label>
+              <div class="drop">Drag a file here or <a href="#">browse</a> · PDF/JPG up to 5 MB</div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;gap:var(--sp-3);margin-top:var(--sp-5)">
+              <a href="#" class="btn btn-ghost">← Back</a>
+              <a href="#" class="btn btn-accent">Continue to review →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- How verification works -->
+        <aside>
+          <div class="aside-card">
+            <h3 style="font-size:var(--t-lg)">How verification works</h3>
+            <div class="flow">
+              <div class="step"><span class="n">1</span><div><div class="t">Sign up &amp; apply</div><div class="d">Create a vendor account and submit your business details for one category.</div></div></div>
+              <div class="step"><span class="n">2</span><div><div class="t">Admin verifies genuineness</div><div class="d">A system administrator checks your business against the registry and approves or rejects.</div></div></div>
+              <div class="step"><span class="n saff">3</span><div><div class="t">ZK-enrolment</div><div class="d">On approval you're enrolled on-chain for the schemes your category serves — privately, via a zero-knowledge proof.</div></div></div>
+              <div class="step"><span class="n">4</span><div><div class="t">Accept e-Rupee</div><div class="d">Receive welfare payments, confirm-on-delivery, then convert tokens to ₹ — approved by RBI.</div></div></div>
+            </div>
+          </div>
+          <div class="aside-card" style="margin-top:var(--sp-4);background:var(--info-bg);border-color:#cfe0fb">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="color:var(--info-fg);flex:none"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="9"/><path d="M11 7h.01M10 11h1v4h1"/></svg></span>
+              <p style="font-size:var(--t-sm);color:var(--info-fg)">No pre-approved vendors — every merchant self-registers and is admin-approved. Your verified business identity is committed on-chain as a private commitment, never as public personal data.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

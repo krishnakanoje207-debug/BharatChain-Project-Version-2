@@ -1,0 +1,106 @@
+"""
+BharatChain public on-chain ledger (The Graph).
+
+Indexes the welfare contracts into a queryable GraphQL API — the authoritative
+read layer for the public RBI→citizen ledger and the admin/RBI dashboards.
+Only on-chain commitments are indexed (addresses, amounts, nullifiers); no PII.
+"""
+
+type Scheme @entity(immutable: false) {
+  "On-chain scheme id."
+  id: ID!
+  name: String!
+  category: Int!
+  fund: BigInt!
+  installmentAmount: BigInt!
+  "Cumulative amount drawn down from the fund (FundDrawnDown.disbursed)."
+  disbursed: BigInt!
+  active: Boolean!
+  createdAt: BigInt!
+  enrollments: [Enrollment!]! @derivedFrom(field: "scheme")
+  installments: [Installment!]! @derivedFrom(field: "scheme")
+  payments: [Payment!]! @derivedFrom(field: "scheme")
+}
+
+type Vendor @entity(immutable: false) {
+  "Vendor on-chain address (lowercased hex)."
+  id: ID!
+  category: Int!
+  approved: Boolean!
+  updatedAt: BigInt!
+  paymentsReceived: [Payment!]! @derivedFrom(field: "vendor")
+  redemptions: [Redemption!]! @derivedFrom(field: "vendor")
+}
+
+type Enrollment @entity(immutable: true) {
+  "txHash-logIndex"
+  id: ID!
+  scheme: Scheme!
+  citizen: Bytes!
+  nullifier: Bytes!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type Installment @entity(immutable: false) {
+  "On-chain installment id."
+  id: ID!
+  scheme: Scheme!
+  merkleRoot: Bytes!
+  allocated: BigInt!
+  claimedCount: Int!
+  claimedTotal: BigInt!
+  timestamp: BigInt!
+  claims: [Claim!]! @derivedFrom(field: "installment")
+}
+
+type Claim @entity(immutable: true) {
+  "installmentId-citizen"
+  id: ID!
+  installment: Installment!
+  scheme: Scheme!
+  citizen: Bytes!
+  amount: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type Payment @entity(immutable: false) {
+  "On-chain payment id."
+  id: ID!
+  citizen: Bytes!
+  vendor: Vendor!
+  scheme: Scheme!
+  amount: BigInt!
+  delivered: Boolean!
+  paidAt: BigInt!
+  deliveredAt: BigInt
+  txHash: Bytes!
+}
+
+type Redemption @entity(immutable: false) {
+  "On-chain redemption request id."
+  id: ID!
+  vendor: Vendor!
+  amount: BigInt!
+  "REQUESTED | APPROVED | REJECTED"
+  status: String!
+  requestedAt: BigInt!
+  decidedAt: BigInt
+}
+
+"Singleton (id: \"global\") rollups for dashboards."
+type Stat @entity(immutable: false) {
+  id: ID!
+  schemeCount: Int!
+  enrollmentCount: Int!
+  installmentCount: Int!
+  claimCount: Int!
+  paymentCount: Int!
+  redemptionCount: Int!
+  totalAllocated: BigInt!
+  totalClaimed: BigInt!
+  totalPaid: BigInt!
+  totalDelivered: BigInt!
+  totalRedeemed: BigInt!
+}

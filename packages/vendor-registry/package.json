@@ -1,0 +1,16 @@
+{
+  "name": "@bharatchain/vendor-registry",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Fixed government business/GST reference registry (deterministic fixture + Merkle root) for vendor ZK eligibility",
+  "type": "module",
+  "main": "src/load.mjs",
+  "scripts": {
+    "build:registry": "node scripts/build.mjs",
+    "build": "echo \"(vendor-registry: run 'npm run build:registry' to regenerate the fixture)\" && exit 0",
+    "lint": "echo \"(vendor-registry lint: TBD)\" && exit 0"
+  },
+  "dependencies": {
+    "@bharatchain/circuits": "*"
+  }
+}

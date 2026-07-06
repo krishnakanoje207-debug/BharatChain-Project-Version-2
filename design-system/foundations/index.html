@@ -1,0 +1,127 @@
+<!-- @dsCard group="Foundations" name="Tokens & Components" subtitle="Palette, type scale, buttons, badges, chips, inputs, cards" -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BharatChain — Foundations</title>
+  <link rel="stylesheet" href="../styles/theme.css" />
+  <style>
+    body { padding: var(--sp-7) 0; }
+    .block { margin-bottom: var(--sp-8); }
+    .block > h2 { font-size: var(--t-2xl); margin-bottom: var(--sp-2); }
+    .block > .caption { margin-bottom: var(--sp-5); display: block; }
+    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-3); }
+    .sw { border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; background: var(--surface); }
+    .sw .chip-c { height: 64px; } .sw .meta { padding: 10px 12px; }
+    .sw .nm { font-weight: 600; font-size: var(--t-sm); } .sw .hex { color: var(--ink-3); font-size: var(--t-xs); }
+    .typescale > * { margin: 0 0 var(--sp-3); }
+    .row { display: flex; flex-wrap: wrap; gap: var(--sp-3); align-items: center; }
+    .space-demo { display: flex; align-items: flex-end; gap: var(--sp-3); }
+    .space-demo i { background: var(--saffron); display: block; border-radius: 4px; }
+    .label { font-size: var(--t-xs); color: var(--ink-3); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: .06em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="block">
+      <span class="eyebrow">Design system</span>
+      <h1 style="margin-top:8px">BharatChain Foundations</h1>
+      <p style="margin-top:12px;font-size:var(--t-lg);max-width:60ch">Modern gov-tech, polished — a calm, trustworthy India palette built on tokens that map directly onto shadcn/ui + Tailwind CSS variables.</p>
+    </header>
+
+    <section class="block">
+      <h2>Color</h2>
+      <span class="caption">Deep navy leads; saffron &amp; green are accents used sparingly. Neutrals are cool, not stark.</span>
+      <div class="swatches">
+        <div class="sw"><div class="chip-c" style="background:var(--navy)"></div><div class="meta"><div class="nm">Navy / Primary</div><div class="hex">#0B2E59</div></div></div>
+        <div class="sw"><div class="chip-c" style="background:var(--navy-900)"></div><div class="meta"><div class="nm">Navy 900 / Hero</div><div class="hex">#061A31</div></div></div>
+        <div class="sw"><div class="chip-c" style="background:var(--saffron)"></div><div class="meta"><div class="nm">Saffron / Accent</div><div class="hex">#FF9933</div></div></div>
+        <div class="sw"><div class="chip-c" style="background:var(--green)"></div><div class="meta"><div class="nm">Green / Success</div><div class="hex">#138808</div></div></div>
+        <div class="sw"><div class="chip-c" style="background:var(--link)"></div><div class="meta"><div class="nm">Link / Interactive</div><div class="hex">#1F6FEB</div></div></div>
+        <div class="sw"><div class="chip-c" style="background:var(--ink)"></div><div class="meta"><div class="nm">Ink / Heading</div><div class="hex">#0F1B2D</div></div></div>
+        <div class="sw"><div class="chip-c" style="background:var(--bg);border-bottom:1px solid var(--border)"></div><div class="meta"><div class="nm">Background</div><div class="hex">#F5F7FB</div></div></div>
+        <div class="sw"><div class="chip-c" style="background:var(--border)"></div><div class="meta"><div class="nm">Border</div><div class="hex">#E4E9F2</div></div></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Typography</h2>
+      <span class="caption">Inter for UI · Noto Serif Devanagari for formal accents (सत्यमेव जयते).</span>
+      <div class="typescale">
+        <h1>Welfare that reaches you</h1>
+        <h2>Find a scheme you’re eligible for</h2>
+        <h3>PM-Kisan Samman Nidhi</h3>
+        <p style="font-size:var(--t-lg)">Large body — Benefits paid directly to your wallet as digital rupee.</p>
+        <p>Base body — Every rupee is auditable, end to end, on a public ledger.</p>
+        <p class="caption">Caption — Ministry of Agriculture &amp; Farmers’ Welfare</p>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Buttons</h2>
+      <span class="caption">Navy primary · saffron for the single key call-to-action · secondary &amp; ghost for the rest.</span>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn btn-primary">Primary</button>
+        <button class="btn btn-accent">Accent CTA</button>
+        <button class="btn btn-secondary">Secondary</button>
+        <button class="btn btn-ghost">Ghost</button>
+      </div>
+      <div class="row">
+        <button class="btn btn-primary btn-sm">Small</button>
+        <button class="btn btn-primary">Default</button>
+        <button class="btn btn-primary btn-lg">Large</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Badges &amp; chips</h2>
+      <div class="row" style="margin-bottom:12px">
+        <span class="badge badge-ok"><span class="dot"></span> APPROVED</span>
+        <span class="badge badge-info">Agriculture</span>
+        <span class="badge badge-warn"><span class="dot"></span> PENDING</span>
+        <span class="badge">Neutral</span>
+      </div>
+      <div class="row">
+        <span class="chip chip-active">All sectors</span>
+        <span class="chip">Education</span>
+        <span class="chip">Housing</span>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Inputs &amp; cards</h2>
+      <div class="grid cols-3">
+        <div>
+          <span class="label">Field</span>
+          <input class="field" placeholder="Enter PAN number" />
+          <span class="label" style="margin-top:16px">Search</span>
+          <div class="search" style="box-shadow:var(--sh-md)"><input class="field" placeholder="Search schemes…" /><button class="btn btn-accent">Go</button></div>
+        </div>
+        <div class="card card-hover">
+          <span class="badge badge-info" style="margin-bottom:12px">Card</span>
+          <h3 style="font-size:var(--t-lg)">Elevated content</h3>
+          <p style="margin-top:8px;font-size:var(--t-sm)">Hover to lift. Used for schemes, stats, and panels across the portal.</p>
+        </div>
+        <div class="card stat" style="display:flex;align-items:center;gap:16px">
+          <div style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--info-bg);color:var(--info-fg)">₹</div>
+          <div><div class="num">₹2,340 Cr</div><div class="lbl">Disbursed transparently</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Spacing &amp; radius</h2>
+      <span class="caption">4-pt base scale · radii 8 / 12 / 16 / 22 px.</span>
+      <div class="space-demo">
+        <div><span class="label">4</span><i style="width:4px;height:32px"></i></div>
+        <div><span class="label">8</span><i style="width:8px;height:40px"></i></div>
+        <div><span class="label">16</span><i style="width:16px;height:48px"></i></div>
+        <div><span class="label">24</span><i style="width:24px;height:56px"></i></div>
+        <div><span class="label">32</span><i style="width:32px;height:64px"></i></div>
+        <div><span class="label">48</span><i style="width:48px;height:72px"></i></div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

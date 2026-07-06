@@ -1,0 +1,150 @@
+specVersion: 1.0.0
+description: BharatChain public welfare ledger
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: SchemeRegistry
+    network: hardhat
+    source:
+      abi: SchemeRegistry
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Scheme
+        - Stat
+      abis:
+        - name: SchemeRegistry
+          file: ./abis/SchemeRegistry.json
+      eventHandlers:
+        - event: SchemeCreated(indexed uint256,string,uint8,uint256,uint256)
+          handler: handleSchemeCreated
+        - event: SchemeStatusChanged(indexed uint256,bool)
+          handler: handleSchemeStatusChanged
+        - event: FundDrawnDown(indexed uint256,uint256,uint256,uint256)
+          handler: handleFundDrawnDown
+      file: ./src/mapping.ts
+  - kind: ethereum
+    name: ZKEnroller
+    network: hardhat
+    source:
+      abi: ZKEnroller
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Enrollment
+        - Scheme
+        - Stat
+      abis:
+        - name: ZKEnroller
+          file: ./abis/ZKEnroller.json
+      eventHandlers:
+        - event: EnrolledWithProof(indexed uint256,indexed address,bytes32)
+          handler: handleEnrolledWithProof
+      file: ./src/mapping.ts
+  - kind: ethereum
+    name: DisbursementController
+    network: hardhat
+    source:
+      abi: DisbursementController
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Installment
+        - Claim
+        - Scheme
+        - Stat
+      abis:
+        - name: DisbursementController
+          file: ./abis/DisbursementController.json
+      eventHandlers:
+        - event: InstallmentCreated(indexed uint256,indexed uint256,bytes32,uint256)
+          handler: handleInstallmentCreated
+        - event: Claimed(indexed uint256,indexed uint256,indexed address,uint256)
+          handler: handleClaimed
+      file: ./src/mapping.ts
+  - kind: ethereum
+    name: PaymentRouter
+    network: hardhat
+    source:
+      abi: PaymentRouter
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Payment
+        - Vendor
+        - Scheme
+        - Stat
+      abis:
+        - name: PaymentRouter
+          file: ./abis/PaymentRouter.json
+      eventHandlers:
+        - event: Paid(indexed uint256,indexed address,indexed address,uint256,uint256)
+          handler: handlePaid
+        - event: Delivered(indexed uint256,indexed address,uint256)
+          handler: handleDelivered
+      file: ./src/mapping.ts
+  - kind: ethereum
+    name: VendorRegistry
+    network: hardhat
+    source:
+      abi: VendorRegistry
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Vendor
+      abis:
+        - name: VendorRegistry
+          file: ./abis/VendorRegistry.json
+      eventHandlers:
+        - event: VendorApproved(indexed address,uint8)
+          handler: handleVendorApproved
+        - event: VendorRevoked(indexed address)
+          handler: handleVendorRevoked
+      file: ./src/mapping.ts
+  - kind: ethereum
+    name: RedemptionController
+    network: hardhat
+    source:
+      abi: RedemptionController
+      address: "0x0000000000000000000000000000000000000000"
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - Redemption
+        - Vendor
+        - Stat
+      abis:
+        - name: RedemptionController
+          file: ./abis/RedemptionController.json
+      eventHandlers:
+        - event: RedemptionRequested(indexed uint256,indexed address,uint256)
+          handler: handleRedemptionRequested
+        - event: RedemptionApproved(indexed uint256,indexed address,uint256)
+          handler: handleRedemptionApproved
+        - event: RedemptionRejected(indexed uint256,indexed address,uint256)
+          handler: handleRedemptionRejected
+      file: ./src/mapping.ts

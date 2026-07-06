@@ -1,0 +1,161 @@
+[
+  {
+    "tag": "about",
+    "questions": [
+      "What is BharatChain?",
+      "What is this website about?",
+      "What does this platform do?",
+      "Tell me about BharatChain.",
+      "Explain BharatChain in simple words."
+    ],
+    "answer": "BharatChain is a blockchain-based welfare-distribution platform that delivers government benefits transparently and corruption-free. Government funds flow RBI → citizens → approved vendors → back to cash, but on-chain every rupee moves only as a digital-rupee token (e₹), so every step is publicly auditable. You apply to a scheme, prove eligibility privately, receive benefits to your account, and spend them only at approved vendors for that scheme."
+  },
+  {
+    "tag": "how-it-works",
+    "questions": [
+      "How does BharatChain work?",
+      "How does it work?",
+      "What are the steps from applying to getting benefits?",
+      "Walk me through the whole process.",
+      "What is the end-to-end flow?"
+    ],
+    "answer": "The journey is: 1) sign up with phone + OTP; 2) pick a scheme and submit your document IDs; 3) your eligibility is checked against the government registry and confirmed with a zero-knowledge proof; 4) you are enrolled on-chain; 5) the government disburses installments to your scheme balance; 6) you pay approved, category-matched vendors from that balance; 7) you confirm delivery; 8) the vendor redeems delivered payments to cash after an RBI check."
+  },
+  {
+    "tag": "e-rupee",
+    "questions": [
+      "What is e-rupee?",
+      "What is the digital rupee?",
+      "What currency does BharatChain use?",
+      "Is e₹ the same as cash?",
+      "Can I send e-rupee to my friend?"
+    ],
+    "answer": "e₹ is a digital rupee where 1 e₹ = ₹1. It is transfer-restricted: you can only spend it at approved vendors whose category matches your scheme, through the app — there is no free person-to-person transfer. This guarantees welfare money is used only for its intended purpose."
+  },
+  {
+    "tag": "apply",
+    "questions": [
+      "How do I apply for a scheme?",
+      "How can I apply?",
+      "How do I check if I am eligible?",
+      "What documents do I need to apply?",
+      "Can I apply to the same scheme twice?"
+    ],
+    "answer": "To apply: choose a scheme, then submit your document IDs (e.g. PAN, Kissan card, land record). They are matched against the fixed government registry, and a zero-knowledge proof confirms you qualify WITHOUT exposing your personal details. If eligible, you are enrolled on-chain. You cannot apply twice to the same scheme."
+  },
+  {
+    "tag": "register-citizen",
+    "questions": [
+      "How do I register?",
+      "How do I sign up?",
+      "How do I create an account?",
+      "How do I register as a citizen?",
+      "How do I join BharatChain?",
+      "How do I get started?"
+    ],
+    "answer": "Registering as a citizen is free and takes a minute:\n1. Open [Create account](/signup) and choose **Citizen**.\n2. Enter your name and mobile number, set a password.\n3. Verify the OTP sent to your phone — your account is ready.\n4. [Sign in](/login), open **Apply** in your dashboard, pick a scheme and submit your document IDs (e.g. PAN, Kissan card, land record). Eligibility is confirmed privately with a zero-knowledge proof, and once enrolled your installments arrive in your scheme balance."
+  },
+  {
+    "tag": "register-vendor",
+    "questions": [
+      "How do I become a vendor?",
+      "How do I become an approved vendor?",
+      "How do I register my shop on BharatChain?",
+      "How can my business accept BharatChain payments?",
+      "What is the process for vendor registration?",
+      "I am a shopkeeper — how do I join?"
+    ],
+    "answer": "Any legitimate business can become an approved BharatChain vendor:\n1. Open [Create account](/signup) and choose **Vendor**, then verify your phone with the OTP.\n2. [Sign in](/login) — you'll land in the vendor portal. Open **Enrollment** and submit your business details: business name, registration/licence ID, category (e.g. agriculture, education, housing) and city.\n3. Your business is checked against the government vendor registry with a zero-knowledge proof, and the government reviews the application.\n4. On approval you are enrolled on-chain and can accept e₹ payments from citizens in your category's schemes. Delivered payments are redeemable to your bank after an RBI check."
+  },
+  {
+    "tag": "login-help",
+    "questions": [
+      "How do I log in?",
+      "I forgot my password.",
+      "I can't sign in to my account.",
+      "How do I reset my password?"
+    ],
+    "answer": "To sign in, open [Sign in](/login) and use your registered mobile number and password. Forgot your password? Reset it with an OTP at [Reset password](/forgot-password). New to BharatChain? [Create account](/signup) as a citizen or a vendor."
+  },
+  {
+    "tag": "payment",
+    "questions": [
+      "How does payment work?",
+      "How do I pay a vendor?",
+      "How do I spend my balance?",
+      "Can I pay any shop?",
+      "Do I need a crypto wallet to pay?"
+    ],
+    "answer": "Payments are category-gated. From your scheme balance you pay an approved vendor whose category matches the scheme — for example an agriculture scheme pays only approved agri-input shops. You hold no crypto keys: a secure server-side relayer moves the e₹ on your behalf. After you receive the goods or service, you confirm delivery."
+  },
+  {
+    "tag": "delivery",
+    "questions": [
+      "What is confirm delivery?",
+      "What happens after I pay a vendor?",
+      "Why do I need to confirm delivery?",
+      "What is proof of delivery?"
+    ],
+    "answer": "After paying, you confirm delivery once you have received the goods or service. Only delivered (citizen-confirmed) payments become redeemable by the vendor. This proof-of-delivery step blocks fake transactions and ensures value really reached you."
+  },
+  {
+    "tag": "redemption",
+    "questions": [
+      "How does a vendor get paid?",
+      "How does redemption work?",
+      "How does a vendor convert e-rupee to cash?",
+      "What is the role of ITR in redemption?"
+    ],
+    "answer": "Vendors redeem only delivered payments. A vendor files a redemption request; the RBI reviews the vendor's legitimacy (ITR / tax filing) and, on approval, the e₹ is burned and a bank payout is issued. Undelivered or unverified value cannot be redeemed."
+  },
+  {
+    "tag": "disbursal",
+    "questions": [
+      "When do I receive my money?",
+      "How am I credited with benefits?",
+      "What is an installment?",
+      "How does disbursal work?"
+    ],
+    "answer": "The government opens an installment for a scheme and credits each eligible beneficiary their installment amount to their scheme balance — drawing the money down from the scheme's fund. You receive a notification whenever an installment is disbursed to you."
+  },
+  {
+    "tag": "privacy",
+    "questions": [
+      "Is my personal data safe?",
+      "Is BharatChain secure?",
+      "Can someone steal my data?",
+      "Is my information private?",
+      "Where is my data stored?"
+    ],
+    "answer": "Your personal data never goes on the blockchain — only cryptographic commitments and one-time nullifiers do. Eligibility uses zero-knowledge proofs, so you prove you qualify without revealing your details. You hold no keys; a secure server-side relayer acts for you, and sensitive records stay in access-controlled databases. The platform can also run entirely on government-hosted AI models so no data leaves national infrastructure."
+  },
+  {
+    "tag": "anti-corruption",
+    "questions": [
+      "How does BharatChain stop corruption?",
+      "How does it prevent fraud?",
+      "Why is this more transparent than normal welfare?",
+      "How are suspicious transactions caught?"
+    ],
+    "answer": "Every transaction is recorded on a tamper-evident, publicly auditable ledger, so funds can be traced end-to-end. An automated monitor also flags suspicious patterns — for example one vendor receiving payments from an abnormal number of citizens, or a sudden burst of payments — and surfaces them to the government's oversight teams. Together these make diversion of welfare funds very hard to hide."
+  },
+  {
+    "tag": "roles",
+    "questions": [
+      "Who can use BharatChain?",
+      "What are the different types of users?",
+      "What does the RBI do here?"
+    ],
+    "answer": "BharatChain has two kinds of accounts: citizens, who apply for schemes and receive benefits, and vendors — government-approved businesses that accept category-matched payments. Scheme administration, vendor approval and redemption oversight are carried out internally by the government and the Reserve Bank as part of the platform's controls."
+  },
+  {
+    "tag": "assistant",
+    "questions": [
+      "Who are you?",
+      "What can you do?",
+      "Which languages do you speak?",
+      "How can you help me?"
+    ],
+    "answer": "I am the BharatChain Assistant. I can explain what this platform is and how it works (eligibility, payments, delivery, redemption), walk you through registering as a citizen or an approved vendor, and — once you sign in — answer questions about your own applications, balances, and payments. I can reply in 14 Indian languages."
+  }
+]

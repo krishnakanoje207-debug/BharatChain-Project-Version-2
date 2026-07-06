@@ -1,0 +1,11 @@
+# Training outputs / caches / large artifacts — keep these on D:, never commit.
+out/
+venv/
+.venv/
+*.gguf
+*.bin
+*.safetensors
+hf-cache/
+__pycache__/
+*.pyc
+# The built dataset IS committed (versioned training data) — do not ignore it.

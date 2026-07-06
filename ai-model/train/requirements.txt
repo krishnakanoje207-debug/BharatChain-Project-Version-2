@@ -1,0 +1,13 @@
+# Fine-tuning deps. Install in a virtualenv ON THE D: DRIVE (C: is space-constrained):
+#   python -m venv D:/bharatchain-ai/venv && D:/bharatchain-ai/venv/Scripts/activate
+# and point the HuggingFace cache at D: before installing/running:
+#   set HF_HOME=D:\bharatchain-ai\hf-cache   (PowerShell: $env:HF_HOME="D:\bharatchain-ai\hf-cache")
+# On a free Colab/Kaggle T4 GPU these install out of the box.
+torch>=2.3
+transformers>=4.44
+peft>=0.12
+trl>=0.9
+datasets>=2.20
+accelerate>=0.33
+bitsandbytes>=0.43   # 4-bit QLoRA (CUDA GPU; skip on CPU-only)
+sentencepiece>=0.2

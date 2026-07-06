@@ -1,0 +1,162 @@
+[
+  {
+    "businessId": "10QKDMZ1757R8ZO",
+    "name": "Krishi Seva Kendra",
+    "category": 0,
+    "categoryLabel": "AGRI_INPUT",
+    "licenseValid": 1,
+    "city": "Bhopal"
+  },
+  {
+    "businessId": "10XSWUW4211K5ZY",
+    "name": "Annapurna Agri Inputs",
+    "category": 0,
+    "categoryLabel": "AGRI_INPUT",
+    "licenseValid": 1,
+    "city": "Nagpur"
+  },
+  {
+    "businessId": "03DZDDU4249F1ZS",
+    "name": "Bharat Institute of Technology",
+    "category": 1,
+    "categoryLabel": "EDU_INSTITUTION",
+    "licenseValid": 1,
+    "city": "Indore"
+  },
+  {
+    "businessId": "33SJSLH5172J8ZV",
+    "name": "Saraswati National University",
+    "category": 1,
+    "categoryLabel": "EDU_INSTITUTION",
+    "licenseValid": 1,
+    "city": "Bhopal"
+  },
+  {
+    "businessId": "10WXVWR4626X5ZQ",
+    "name": "DigiBharat Tech Store",
+    "category": 2,
+    "categoryLabel": "TECH_STORE",
+    "licenseValid": 1,
+    "city": "Jaipur"
+  },
+  {
+    "businessId": "10RXVOE0505A5ZJ",
+    "name": "Sharma Electronics & Computers",
+    "category": 2,
+    "categoryLabel": "TECH_STORE",
+    "licenseValid": 1,
+    "city": "Nagpur"
+  },
+  {
+    "businessId": "36ERIHM0432N4ZD",
+    "name": "Shakti Cement & Building Materials",
+    "category": 3,
+    "categoryLabel": "HOUSING_MATERIAL",
+    "licenseValid": 1,
+    "city": "Raipur"
+  },
+  {
+    "businessId": "33OVCYD9554B4ZD",
+    "name": "Ambika Steel & Hardware Suppliers",
+    "category": 3,
+    "categoryLabel": "HOUSING_MATERIAL",
+    "licenseValid": 1,
+    "city": "Kanpur"
+  },
+  {
+    "businessId": "09UNVZA2825Z6ZP",
+    "name": "Green Field Agro Centre",
+    "category": 0,
+    "categoryLabel": "AGRI_INPUT",
+    "licenseValid": 1,
+    "city": "Ludhiana"
+  },
+  {
+    "businessId": "23TRTZT7711O2ZE",
+    "name": "Kisan Mandi Supplies",
+    "category": 0,
+    "categoryLabel": "AGRI_INPUT",
+    "licenseValid": 1,
+    "city": "Hisar"
+  },
+  {
+    "businessId": "08KSJXX2531D5ZR",
+    "name": "Sunrise Seeds & Fertilisers",
+    "category": 0,
+    "categoryLabel": "AGRI_INPUT",
+    "licenseValid": 0,
+    "city": "Guntur"
+  },
+  {
+    "businessId": "03XXMNO3230V4ZX",
+    "name": "National College of Engineering",
+    "category": 1,
+    "categoryLabel": "EDU_INSTITUTION",
+    "licenseValid": 1,
+    "city": "Pune"
+  },
+  {
+    "businessId": "08HHZOY9496I2ZX",
+    "name": "Gyan Jyoti Vidyalaya",
+    "category": 1,
+    "categoryLabel": "EDU_INSTITUTION",
+    "licenseValid": 1,
+    "city": "Lucknow"
+  },
+  {
+    "businessId": "23ZYNER2509Y6ZO",
+    "name": "Heritage Public School",
+    "category": 1,
+    "categoryLabel": "EDU_INSTITUTION",
+    "licenseValid": 0,
+    "city": "Patna"
+  },
+  {
+    "businessId": "03FZJFD3532V1ZS",
+    "name": "TechnoMart Computer Bazaar",
+    "category": 2,
+    "categoryLabel": "TECH_STORE",
+    "licenseValid": 1,
+    "city": "Hyderabad"
+  },
+  {
+    "businessId": "33EUFTB1875K5ZO",
+    "name": "Bharti Mobile & Gadgets",
+    "category": 2,
+    "categoryLabel": "TECH_STORE",
+    "licenseValid": 1,
+    "city": "Surat"
+  },
+  {
+    "businessId": "27EZZJS3826J9ZF",
+    "name": "ClickBuy Electronics Hub",
+    "category": 2,
+    "categoryLabel": "TECH_STORE",
+    "licenseValid": 0,
+    "city": "Kolkata"
+  },
+  {
+    "businessId": "08FLXLU2257I5ZN",
+    "name": "Maa Durga Cement Depot",
+    "category": 3,
+    "categoryLabel": "HOUSING_MATERIAL",
+    "licenseValid": 1,
+    "city": "Ranchi"
+  },
+  {
+    "businessId": "08IMHFS8199A6ZZ",
+    "name": "Vishwakarma Hardware Mart",
+    "category": 3,
+    "categoryLabel": "HOUSING_MATERIAL",
+    "licenseValid": 1,
+    "city": "Jaipur"
+  },
+  {
+    "businessId": "33IMIJE0845Y9ZY",
+    "name": "Sai Construction Stores",
+    "category": 3,
+    "categoryLabel": "HOUSING_MATERIAL",
+    "licenseValid": 0,
+    "city": "Nagpur"
+  }
+]

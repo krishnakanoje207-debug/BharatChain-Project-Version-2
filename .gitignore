@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Hardhat / contracts
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+deployments/
+
+# Circom / ZK artifacts (large; generated)
+*.zkey
+*.r1cs
+*.wasm
+*.ptau
+packages/circuits/build/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Docker / data volumes
+infra/data/
+
+# Claude Code local (personal) settings
+.claude/settings.local.json
+
+# Misc
+tmp/
+.temp/
+
+# Local working files - never publish (prompts, briefs, stray captures, tool state)
+*.docx
+*.pptx
+*.doc
+Screenshot*.png
+.design-sync/
+graphify-out/
+.claude/
+
+# Internal dev logs - kept locally, not published
+docs/DECISIONS.md
+docs/GAP_ANALYSIS.md

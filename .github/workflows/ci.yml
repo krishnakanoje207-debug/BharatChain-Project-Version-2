@@ -1,0 +1,53 @@
+name: CI
+
+# Every push/PR is gated on: contract tests (incl. a real ZK proof), the backend
+# unit suite, and a clean production build of the unified frontend.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  # ---- Contracts + zero-knowledge ----
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Build shared types
+        run: npm run build -w @bharatchain/shared
+      - name: Install circom
+        run: |
+          curl -L https://github.com/iden3/circom/releases/download/v2.2.3/circom-linux-amd64 -o /usr/local/bin/circom
+          chmod +x /usr/local/bin/circom
+          circom --version
+      - name: Build ZK artifacts (wasm + proving key)
+        run: npm run zk:build -w @bharatchain/circuits
+      - name: Compile contracts
+        run: npm run contracts:compile
+      - name: Contract tests (incl. a real proof)
+        run: npm run contracts:test
+
+  # ---- Backend API + frontends ----
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Build shared types
+        run: npm run build -w @bharatchain/shared
+      - name: Backend tests (92, infra-free)
+        run: npm test -w @bharatchain/backend
+      - name: Build frontend
+        run: npm run build -w @bharatchain/web
+      - name: Lint (all workspaces)
+        run: npm run lint --workspaces --if-present
