@@ -24,6 +24,10 @@ const config: HardhatUserConfig = {
       url: process.env.AMOY_RPC_URL || "",
       chainId: 80002,
       accounts,
+      // Amoy enforces a 25 gwei minimum priority fee; ethers' estimator can land
+      // a hair below it (24.999...), so pin a legacy 30 gwei gas price (matches
+      // the estimate-gas dry-run cost basis).
+      gasPrice: 30_000_000_000,
     },
     arbitrumSepolia: {
       url: process.env.ARBITRUM_SEPOLIA_RPC_URL || "",
