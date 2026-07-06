@@ -62,8 +62,9 @@ services:
         sync: false
       - key: CHAIN_RPC_URL
         sync: false
+      # Vercel production origins (non-secret) — exact match, no trailing slash.
       - key: CORS_ORIGINS
-        sync: false
+        value: https://bharatchain-web.vercel.app,https://bharatchain-web-krishnakanoje207-debugs-projects.vercel.app
       - key: GROQ_API_KEY
         sync: false
       - key: ADMIN_PHONE
