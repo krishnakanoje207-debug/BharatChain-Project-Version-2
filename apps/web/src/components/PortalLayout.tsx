@@ -3,7 +3,7 @@ import Assistant from "./Assistant";
 import Emblem from "./Emblem";
 import { Icon, IconName } from "./icons";
 import { useAuth } from "../lib/auth";
-import { useT } from "../lib/i18n";
+import { useT, LANGS, LangCode } from "../lib/i18n";
 
 export interface PortalNavItem { to: string; label: string; icon: IconName; end?: boolean }
 
@@ -18,8 +18,10 @@ function initials(name?: string, phone?: string): string {
 /** Sidebar shell for the authenticated portals (citizen / vendor / admin / RBI). */
 export default function PortalLayout({ roleLabel, nav }: { roleLabel: string; nav: PortalNavItem[] }) {
   const { user, logout } = useAuth();
-  const { t } = useT();
+  const { t, lang, setLang } = useT();
   const loc = useLocation();
+  // Citizen + vendor portals are translated; admin/RBI operator tools stay English.
+  const showLang = user?.role === "CITIZEN" || user?.role === "VENDOR";
 
   const active =
     [...nav].sort((a, b) => b.to.length - a.to.length)
@@ -68,6 +70,15 @@ export default function PortalLayout({ roleLabel, nav }: { roleLabel: string; na
             <h1>{t(active.label)}</h1>
           </div>
           <div className="spacer" />
+          {showLang && (
+            <label className="p-lang-wrap" title={t("a11y.language")}>
+              <Icon.globe size={15} />
+              <select className="p-lang" value={lang} aria-label={t("a11y.language")}
+                onChange={(e) => setLang(e.target.value as LangCode)}>
+                {LANGS.map((l) => <option key={l.code} value={l.code}>{l.native}</option>)}
+              </select>
+            </label>
+          )}
           <Link to="/" className="btn btn-ghost btn-sm"><Icon.external size={15} /> {t("acct.publicSite")}</Link>
         </div>
         <div className="p-content"><Outlet /></div>

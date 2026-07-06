@@ -175,6 +175,21 @@ def visitor_examples(rng, n_personal=24, n_schemes=10):
     for _ in range(n_personal):
         out.append(msg(SYSTEM, ctx_prompt(rng.choice(personal_qs), ctx), invite))
 
+    # Off-topic questions -> polite scope refusal (both modes; context irrelevant).
+    offtopic_qs = [
+        "Who won the cricket world cup?", "Write me a poem about the moon.",
+        "What is the capital of France?", "Can you help me with my maths homework?",
+        "Tell me a joke.", "What's the weather today?", "How do I file income tax online?",
+        "Recommend a good movie.", "Translate this song for me.", "Who is the prime minister?",
+        "How do I code a website?", "What stocks should I buy?",
+    ]
+    refusal = ("I'm the BharatChain Assistant, so I can only help with questions about this platform — "
+               "schemes, eligibility, registration, payments, delivery, or redemption. "
+               "Is there anything about BharatChain I can help you with?")
+    for q in offtopic_qs:
+        out.append(msg(SYSTEM, ctx_prompt(q, ctx), refusal))
+        out.append(msg(SYSTEM, ctx_prompt(q, base_context(rng.choice(NAMES))), refusal))
+
     # Public scheme catalog questions -> grounded listing with links.
     scheme_qs = ["Which schemes are open right now?", "What schemes are active?",
                  "What benefits are available?", "Show me the current government schemes."]

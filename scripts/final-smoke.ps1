@@ -37,9 +37,12 @@ chk "non-farmer REJECTED (proof fails)" ($nsub.status -eq "REJECTED")
 Write-Host "`n=== 4. Admin disburse scheme 0 ==="
 $admin = (Post "/auth/login" @{phone="9000000000";password="admin12345"} $null).tokens.accessToken
 $round = Post "/disbursement/rounds" @{schemeId=0} $admin
-chk "round disbursed all beneficiaries, 0 failures (claimed $($round.claimed)/$($round.beneficiaryCount))" ($round.beneficiaryCount -ge 1 -and $round.claimed -eq $round.beneficiaryCount -and $round.failed -eq 0)
+chk "round disbursed all beneficiaries, 0 failures (claimed $($round.claimedCount)/$($round.beneficiaryCount))" ($round.beneficiaryCount -ge 1 -and $round.claimedCount -eq $round.beneficiaryCount -and $round.failed -eq 0)
+# A fresh enrollee is caught up to the FULL cumulative entitlement (installmentNo x 10000),
+# so this stays correct on repeat runs against the same deployment.
+$expect = [decimal]$round.installmentNo * 10000
 $ent = Get- "/me/entitlements" $farmer.token
-chk "farmer entitlement = 10000" ($ent[0].entitlementFormatted -eq "10000.0")
+chk "farmer entitlement = $expect (installment level $($round.installmentNo))" ([decimal]$ent[0].entitlementFormatted -eq $expect)
 
 Write-Host "`n=== 5. Token app: pay vendor + confirm delivery ==="
 $vendors = Get- "/vendors?schemeId=0" $farmer.token
@@ -48,8 +51,9 @@ $pay = Post "/payments" @{schemeId=0;vendorAddress=$annapurna.address;amount="40
 chk "payment PAID" ($pay.status -eq "PAID")
 $conf = Post "/payments/$($pay.id)/confirm" @{} $farmer.token
 chk "delivery confirmed -> DELIVERED" ($conf.status -eq "DELIVERED")
+$expectAfter = $expect - 4000
 $ent2 = Get- "/me/entitlements" $farmer.token
-chk "entitlement after pay = 6000" ($ent2[0].entitlementFormatted -eq "6000.0")
+chk "entitlement after pay = $expectAfter" ([decimal]$ent2[0].entitlementFormatted -eq $expectAfter)
 
 Write-Host "`n=== 6. Category gate (negative) ==="
 $edu = Get- "/vendors?category=EDU_INSTITUTION" $farmer.token
@@ -60,7 +64,7 @@ Write-Host "`n=== 7. Assistant (platform KB + grounded) ==="
 $a1 = Post "/assistant/chat" @{message="What is BharatChain?"} $farmer.token
 chk "assistant explains platform" ($a1.answer -match "blockchain-based welfare")
 $a2 = Post "/assistant/chat" @{message="How much balance do I have?"} $farmer.token
-chk "assistant grounded balance (6000)" ($a2.answer -match "6000")
+chk "assistant grounded balance ($expectAfter)" ($a2.answer -match "$expectAfter")
 
 Write-Host "`n=== 8. Fraud monitor: velocity ==="
 for ($i=0;$i -lt 4;$i++){ Post "/payments" @{schemeId=0;vendorAddress=$annapurna.address;amount="500"} $farmer.token | Out-Null }

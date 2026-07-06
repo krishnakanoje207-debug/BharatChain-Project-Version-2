@@ -1,0 +1,70 @@
+# Render blueprint — BharatChain backend (NestJS API + relayer) on the free plan.
+# The web portal deploys separately to Vercel (apps/web, VITE_API_URL → this service).
+#
+# Fill the sync:false secrets in the Render dashboard after "New → Blueprint":
+#   DATABASE_URL         Neon Postgres URL (keep ?sslmode=require)
+#   REDIS_URL            Upstash Redis rediss:// URL
+#   RELAYER_PRIVATE_KEY  fresh funded Amoy key — NEVER the Hardhat dev key
+#   CHAIN_RPC_URL        Amoy RPC (e.g. https://rpc-amoy.polygon.technology)
+#   CORS_ORIGINS         the Vercel URL(s), comma-separated
+#   GROQ_API_KEY         assistant LLM (free tier)
+#   ADMIN_PHONE/ADMIN_PASSWORD  strong values used when the DB was seeded
+#
+# Free-plan notes: service spins down when idle (first request ~30-60s cold start);
+# Kafka/MinIO/Graph/Ollama are not present — all are best-effort and degrade cleanly.
+services:
+  - type: web
+    name: bharatchain-backend
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build -w @bharatchain/shared && npm run build -w @bharatchain/backend
+    startCommand: npm run start:prod -w @bharatchain/backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NODE_ENV
+        value: production
+      # Prototype has no migrations — schema still builds on boot (see database.module.ts).
+      - key: DB_SYNCHRONIZE
+        value: "true"
+      - key: CHAIN_NETWORK
+        value: amoy
+      - key: CHAIN_ID
+        value: "80002"
+      - key: KAFKA_ENABLED
+        value: "false"
+      - key: USE_CHAINLINK_AUTOMATION
+        value: "false"
+      - key: CRON_DISBURSAL_ENABLED
+        value: "true"
+      - key: CRON_DISBURSAL_SCHEDULE
+        value: "*/2 * * * *"
+      - key: SMS_PROVIDER
+        value: simulated
+      - key: LLM_PROVIDER
+        value: groq
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: REFRESH_EXPIRES_IN
+        value: 7d
+      - key: SESSION_HEARTBEAT_TIMEOUT_SECONDS
+        value: "60"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: RELAYER_PRIVATE_KEY
+        sync: false
+      - key: CHAIN_RPC_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ADMIN_PHONE
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

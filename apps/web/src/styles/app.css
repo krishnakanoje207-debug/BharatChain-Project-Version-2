@@ -333,3 +333,8 @@ footer.site .brand .wm { color: #fff; } footer.site .brand .motto { color: #7e93
   .subnav .container-wide { overflow-x: auto; }
   .ai-fab span.txt { display: none; }
 }
+
+/* Portal top-bar language picker (citizen/vendor portals; light surface) */
+.p-lang-wrap { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); }
+select.p-lang { background: var(--surface); border: 1px solid var(--border-strong); color: var(--ink); font: inherit; font-size: var(--t-sm); padding: 5px 8px; border-radius: 7px; cursor: pointer; max-width: 170px; }
+select.p-lang:hover { border-color: var(--navy); }

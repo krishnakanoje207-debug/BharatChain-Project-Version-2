@@ -1,17 +1,20 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit, ServiceUnavailableException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Client } from "minio";
 import { randomUUID } from "node:crypto";
 
 /**
- * Document storage on MinIO (S3-compatible, self-hosted — $0). Holds the raw
- * uploaded document bytes; only object keys + metadata are kept in Postgres.
+ * Document storage on MinIO / any S3-compatible store. Holds the raw uploaded
+ * document bytes; only object keys + metadata are kept in Postgres.
+ * Best-effort (like Kafka): if the store is unreachable the app still boots —
+ * only the optional file-upload endpoint degrades with a clear 503.
  */
 @Injectable()
 export class StorageService implements OnModuleInit {
   private readonly logger = new Logger(StorageService.name);
   private client!: Client;
   private bucket!: string;
+  private available = false;
 
   constructor(private readonly config: ConfigService) {}
 
@@ -24,11 +27,27 @@ export class StorageService implements OnModuleInit {
       accessKey: this.config.get<string>("MINIO_ACCESS_KEY", "minioadmin"),
       secretKey: this.config.get<string>("MINIO_SECRET_KEY", "minioadmin"),
     });
-    if (!(await this.client.bucketExists(this.bucket))) {
-      await this.client.makeBucket(this.bucket);
-      this.logger.log(`Created bucket '${this.bucket}'`);
+    try {
+      if (!(await this.client.bucketExists(this.bucket))) {
+        await this.client.makeBucket(this.bucket);
+        this.logger.log(`Created bucket '${this.bucket}'`);
+      }
+      this.available = true;
+      this.logger.log(`Storage ready: bucket='${this.bucket}'`);
+    } catch (err) {
+      this.available = false;
+      this.logger.warn(
+        `Object storage unreachable — document FILE uploads disabled (apply flow unaffected): ${(err as Error).message}`,
+      );
     }
-    this.logger.log(`Storage ready: bucket='${this.bucket}'`);
+  }
+
+  private ensureAvailable(): void {
+    if (!this.available) {
+      throw new ServiceUnavailableException(
+        "Document file upload is temporarily unavailable. You can still apply using your document IDs.",
+      );
+    }
   }
 
   /** Store a document under applications/<applicationId>/<uuid>-<name>. Returns the object key. */
@@ -38,6 +57,7 @@ export class StorageService implements OnModuleInit {
     body: Buffer,
     contentType?: string,
   ): Promise<string> {
+    this.ensureAvailable();
     const safe = originalName.replace(/[^\w.\-]+/g, "_");
     const key = `applications/${applicationId}/${randomUUID()}-${safe}`;
     await this.client.putObject(this.bucket, key, body, body.length, {
@@ -48,6 +68,7 @@ export class StorageService implements OnModuleInit {
 
   /** Time-limited download URL (default 5 min) for an object. */
   presignedGet(objectKey: string, expirySeconds = 300): Promise<string> {
+    this.ensureAvailable();
     return this.client.presignedGetObject(this.bucket, objectKey, expirySeconds);
   }
 }

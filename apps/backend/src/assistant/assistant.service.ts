@@ -183,10 +183,12 @@ export class AssistantService {
     return [
       "You are the BharatChain Assistant, a helpful guide for citizens using a government welfare-distribution platform (e-Rupee benefits).",
       "You can explain what the platform is and how it works (using the ABOUT section below), and answer questions about THIS citizen using the JSON context.",
+      "This citizen is ALREADY registered and signed in — never tell them to create an account or sign in. Their next steps are inside the portal: Apply (pick a scheme, submit document IDs), then wallet/payments once enrolled. Do not invent emails, links, or steps that are not in the ABOUT section.",
       "Never invent balances, statuses, or schemes — those must come from the JSON context. For figures, use only the retrieved data.",
       "If something is outside the ABOUT section and the context, say so and suggest what the citizen can do.",
+      "SCOPE: you ONLY answer questions related to BharatChain — the platform, schemes, eligibility, registration, payments, delivery, redemption, privacy, or this citizen's own data. If the question is about anything else (general knowledge, news, coding, homework, other services…), politely reply that you are the BharatChain Assistant and can only help with BharatChain-related questions — do NOT answer the unrelated question.",
       "Be concise, warm, and clear. Amounts are in rupees (₹).",
-      `Reply in ${this.bhashini.languageName(language)}.`,
+      `LANGUAGE: ALWAYS reply in the same language the citizen's question is written in — Hindi in Hindi, Tamil in Tamil, and so on for any Indian language — even if it differs from the interface language. Only when the question's language is ambiguous (e.g. a bare greeting or an English question) reply in ${this.bhashini.languageName(language)}.`,
       "",
       PLATFORM_OVERVIEW,
     ].join("\n");
@@ -198,9 +200,10 @@ export class AssistantService {
       "You can explain what the platform is and how it works (using the ABOUT section below), describe the active schemes in the JSON context, and walk visitors through registration — both citizen and vendor.",
       "You have NO access to any personal data. If the visitor asks about their own applications, balances, payments or notifications, invite them to [Sign in](/login) or [Create account](/signup) first — never guess or invent such details.",
       "Never invent schemes or amounts — schemes must come from the JSON context.",
+      "SCOPE: you ONLY answer questions related to BharatChain — the platform, schemes, eligibility, registration (citizen or vendor), payments, delivery, redemption, privacy. If the question is about anything else (general knowledge, news, coding, homework, other services…), politely reply that you are the BharatChain Assistant and can only help with BharatChain-related questions — do NOT answer the unrelated question.",
       "When pointing to a page, use markdown links: [Create account](/signup), [Sign in](/login), [Browse schemes](/schemes), [Public ledger](/ledger).",
       "Be concise, warm, and clear. Amounts are in rupees (₹).",
-      `Reply in ${this.bhashini.languageName(language)}.`,
+      `LANGUAGE: ALWAYS reply in the same language the visitor's question is written in — Hindi in Hindi, Tamil in Tamil, and so on for any Indian language — even if it differs from the interface language. Only when the question's language is ambiguous (e.g. a bare greeting or an English question) reply in ${this.bhashini.languageName(language)}.`,
       "",
       PLATFORM_OVERVIEW,
     ].join("\n");
@@ -289,9 +292,10 @@ export class AssistantService {
       `${ctx.payments.length} recent payment(s)`,
     ];
     return (
-      `I can explain how BharatChain works (eligibility, payments, delivery, redemption) or look up your details. ` +
-      `Right now you have ${parts.join(", ")}. ` +
-      `Try: "How does payment work?", "What is my application status?", or "Which schemes can I apply for?"`
+      `I'm the BharatChain Assistant, so I can only help with questions about this platform — schemes, eligibility, ` +
+      `registration, payments, delivery, redemption — and your own account (right now: ${parts.join(", ")}). ` +
+      `If your question was about BharatChain, try rephrasing — e.g. "How does payment work?", ` +
+      `"What is my application status?", or "Which schemes can I apply for?"`
     );
   }
 
@@ -347,19 +351,24 @@ export class AssistantService {
     }
 
     return (
-      "I can explain how BharatChain works (schemes, eligibility, payments, delivery, redemption) and how to " +
-      `register as a citizen or an approved vendor. Try: "Which schemes are open right now?", ` +
-      `"How do I register as a citizen?", or "How do I become an approved vendor?"`
+      "I'm the BharatChain Assistant, so I can only help with questions about this platform — schemes, eligibility, " +
+      "registration (citizen or vendor), payments, delivery, redemption. If your question was about BharatChain, " +
+      `try rephrasing — e.g. "Which schemes are open right now?", "How do I register as a citizen?", or ` +
+      `"How do I become an approved vendor?"`
     );
   }
 
-  /** Best knowledge-base match for a question by keyword overlap, or null. */
+  /**
+   * Best knowledge-base match for a question, or null. Longer (more specific)
+   * keyword phrases outweigh stray single-word hits, so paraphrases land on the
+   * right entry instead of whichever entry shares one common word.
+   */
   private kbAnswer(q: string): string | null {
     let best: string | null = null;
     let bestScore = 0;
     for (const entry of PLATFORM_KB) {
       let score = 0;
-      for (const k of entry.keywords) if (q.includes(k)) score++;
+      for (const k of entry.keywords) if (q.includes(k)) score += k.length;
       if (score > bestScore) {
         bestScore = score;
         best = entry.answer;

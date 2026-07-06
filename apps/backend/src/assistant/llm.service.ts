@@ -58,7 +58,9 @@ export class LlmService {
       headers: { "content-type": "application/json", authorization: `Bearer ${this.groqKey}` },
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
-        temperature: 0.2,
+        temperature: 0.3,
+        // Curb token-loop repetition in Indic-script replies (Tamil/Telugu/etc.).
+        frequency_penalty: 0.5,
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },
