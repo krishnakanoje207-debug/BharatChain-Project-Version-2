@@ -17,7 +17,9 @@ services:
     name: bharatchain-backend
     runtime: node
     plan: free
-    buildCommand: npm ci && npm run build -w @bharatchain/shared && npm run build -w @bharatchain/backend
+    # --include=dev: NODE_ENV=production would otherwise drop the build toolchain
+    # (nest/tsc are devDependencies) — the runtime image still runs compiled dist/.
+    buildCommand: npm ci --include=dev && npm run build -w @bharatchain/shared && npm run build -w @bharatchain/backend
     startCommand: npm run start:prod -w @bharatchain/backend
     healthCheckPath: /api/health
     envVars:
