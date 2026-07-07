@@ -44,6 +44,12 @@ services:
         value: "*/2 * * * *"
       - key: SMS_PROVIDER
         value: simulated
+      # Team-testing only: returns the OTP code in the signup API response (and the
+      # web UI auto-fills it) even under NODE_ENV=production. Set to "true" in the
+      # Render dashboard while your team is testing signup; set back to "false" (or
+      # remove it) before the link is demoed/shared publicly.
+      - key: OTP_EXPOSE_CODE
+        value: "false"
       - key: LLM_PROVIDER
         value: groq
       - key: JWT_EXPIRES_IN

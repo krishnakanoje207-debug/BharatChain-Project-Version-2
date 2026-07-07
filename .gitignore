@@ -57,6 +57,7 @@ tmp/
 *.docx
 *.pptx
 *.doc
+*.xlsx
 Screenshot*.png
 .design-sync/
 graphify-out/

@@ -11,7 +11,9 @@ const OTP_TTL_SECONDS = 300; // 5 minutes
  * Simulated SMS OTP (no paid SMS gateway — per the $0 constraint). Codes are
  * stored in Redis with a TTL and "delivered" by logging to the console. In
  * non-production the generated code is returned to the caller so the demo UI
- * can display it; never do that in production.
+ * can display it. In production it's hidden unless OTP_EXPOSE_CODE=true is set
+ * (a deliberate, temporary opt-in for team testing on a hosted deploy without
+ * a real SMS gateway — turn it back off before sharing the link publicly).
  */
 @Injectable()
 export class OtpService {
@@ -23,7 +25,10 @@ export class OtpService {
   ) {}
 
   private get devMode(): boolean {
-    return this.config.get<string>("NODE_ENV") !== "production";
+    return (
+      this.config.get<string>("NODE_ENV") !== "production" ||
+      this.config.get<string>("OTP_EXPOSE_CODE") === "true"
+    );
   }
 
   /** Generate + store a 6-digit code. Returns the code only in dev mode. */
