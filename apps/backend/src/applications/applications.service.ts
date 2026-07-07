@@ -59,8 +59,15 @@ export class ApplicationsService {
 
     const match = await this.registry.findByPan(dto.pan);
     if (!match) throw new NotFoundException("This PAN was not found in the government registry.");
+    // Cross-check whichever scheme-specific declarations the citizen supplied against the
+    // fixed registry (a friendly pre-check; the zk proof is the authoritative gate at submit).
     this.assertDeclaredMatches("Kissan card number", dto.kissan, match.record.kissan);
     this.assertDeclaredMatches("Land record id", dto.land, match.record.land);
+    this.assertDeclaredNumberMatches("Caste category", dto.caste, match.record.caste);
+    this.assertDeclaredNumberMatches("Housing status", dto.houseStatus, match.record.houseStatus);
+    if (dto.isStudent !== undefined && Number(dto.isStudent) !== match.record.isStudent) {
+      throw new BadRequestException("Student status does not match government records.");
+    }
 
     // Clear out the prior rejected attempt (and its documents) before retrying.
     if (dup) {
@@ -251,6 +258,12 @@ export class ApplicationsService {
 
   private assertDeclaredMatches(label: string, declared: string | undefined, onRecord: string): void {
     if (declared && onRecord && declared.trim().toUpperCase() !== onRecord.toUpperCase()) {
+      throw new BadRequestException(`${label} does not match government records.`);
+    }
+  }
+
+  private assertDeclaredNumberMatches(label: string, declared: number | undefined, onRecord: number): void {
+    if (declared !== undefined && declared !== onRecord) {
       throw new BadRequestException(`${label} does not match government records.`);
     }
   }

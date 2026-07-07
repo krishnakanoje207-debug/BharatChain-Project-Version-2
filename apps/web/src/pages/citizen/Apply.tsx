@@ -16,7 +16,7 @@ export default function Apply() {
   const preset = id ?? params.get("scheme") ?? params.get("schemeId");
   const [schemes, setSchemes] = useState<SchemeView[] | null>(null);
   const [schemeId, setSchemeId] = useState<number | null>(preset ? Number(preset) : null);
-  const [form, setForm] = useState({ pan: "", kissan: "", land: "" });
+  const [form, setForm] = useState({ pan: "", kissan: "", land: "", caste: "", isStudent: "", houseStatus: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
@@ -24,15 +24,25 @@ export default function Apply() {
   usePoll(() => { api.allSchemes().then((s) => setSchemes(s.filter((x) => x.active))).catch(() => setSchemes([])); }, 15000);
 
   const scheme = schemes?.find((s) => s.schemeId === schemeId);
+  const cat = scheme?.category;
 
   const submit = async () => {
     if (schemeId == null) return;
     setErr(null); setBusy(true);
     try {
-      const created = await api.createApplication({
-        schemeId, pan: form.pan.toUpperCase().trim(),
-        kissan: form.kissan.trim() || undefined, land: form.land.trim() || undefined,
-      });
+      // Send only the declarations relevant to this scheme's sector, so a value
+      // left over from a previously-viewed scheme is never submitted.
+      const payload: Parameters<typeof api.createApplication>[0] = { schemeId, pan: form.pan.toUpperCase().trim() };
+      if (cat === "AGRICULTURE") {
+        payload.kissan = form.kissan.trim() || undefined;
+        payload.land = form.land.trim() || undefined;
+      } else if (cat === "EDUCATION") {
+        if (form.caste !== "") payload.caste = Number(form.caste);
+        if (form.isStudent !== "") payload.isStudent = form.isStudent === "yes";
+      } else if (cat === "HOUSING") {
+        if (form.houseStatus !== "") payload.houseStatus = Number(form.houseStatus);
+      }
+      const created = await api.createApplication(payload);
       const res = await api.submitApplication(created.id);
       setResult(res);
     } catch (e) {
@@ -98,23 +108,67 @@ export default function Apply() {
       <Panel title={t("cz.apply.formTitle")} sub={scheme ? scheme.name : `Scheme #${schemeId}`}
         actions={<button className="btn btn-ghost btn-sm" onClick={() => setSchemeId(null)}>{t("cz.apply.changeScheme")}</button>}>
         {err && <Notice kind="err">{err}</Notice>}
-        <Notice>{t("cz.apply.proofNotice")}</Notice>
+        <Notice>{cat === "AGRICULTURE" ? t("cz.apply.proofNotice") : t("cz.apply.proofNoticeAttr")}</Notice>
 
         <div className="stack" style={{ marginTop: "var(--sp-4)" }}>
           <div className="form-row">
             <label className="lbl">PAN</label>
             <input className="field" value={form.pan} onChange={(e) => setForm({ ...form, pan: e.target.value })} placeholder="ABCDE1234F" style={{ textTransform: "uppercase" }} required />
           </div>
-          <div className="form-grid">
-            <div className="form-row">
-              <label className="lbl">{t("cz.apply.kisan")} <span className="caption">{t("common.optional")}</span></label>
-              <input className="field" value={form.kissan} onChange={(e) => setForm({ ...form, kissan: e.target.value })} placeholder="KCC100000" />
+
+          {/* Agriculture (PM-Kisan): Kisan Credit Card + land record. */}
+          {cat === "AGRICULTURE" && (
+            <div className="form-grid">
+              <div className="form-row">
+                <label className="lbl">{t("cz.apply.kisan")} <span className="caption">{t("common.optional")}</span></label>
+                <input className="field" value={form.kissan} onChange={(e) => setForm({ ...form, kissan: e.target.value })} placeholder="KCC100000" />
+              </div>
+              <div className="form-row">
+                <label className="lbl">{t("cz.apply.land")} <span className="caption">{t("common.optional")}</span></label>
+                <input className="field" value={form.land} onChange={(e) => setForm({ ...form, land: e.target.value })} placeholder="LR200000" />
+              </div>
             </div>
-            <div className="form-row">
-              <label className="lbl">{t("cz.apply.land")} <span className="caption">{t("common.optional")}</span></label>
-              <input className="field" value={form.land} onChange={(e) => setForm({ ...form, land: e.target.value })} placeholder="LR200000" />
+          )}
+
+          {/* Education (Post-Matric scholarship): caste category + student status. */}
+          {cat === "EDUCATION" && (
+            <div className="form-grid">
+              <div className="form-row">
+                <label className="lbl">{t("cz.apply.caste")}</label>
+                <select className="field" value={form.caste} onChange={(e) => setForm({ ...form, caste: e.target.value })}>
+                  <option value="">{t("cz.apply.selectPrompt")}</option>
+                  <option value="0">{t("cz.apply.caste.general")}</option>
+                  <option value="1">{t("cz.apply.caste.sc")}</option>
+                  <option value="2">{t("cz.apply.caste.st")}</option>
+                  <option value="3">{t("cz.apply.caste.obc")}</option>
+                  <option value="4">{t("cz.apply.caste.ebc")}</option>
+                  <option value="5">{t("cz.apply.caste.minority")}</option>
+                </select>
+              </div>
+              <div className="form-row">
+                <label className="lbl">{t("cz.apply.student")}</label>
+                <select className="field" value={form.isStudent} onChange={(e) => setForm({ ...form, isStudent: e.target.value })}>
+                  <option value="">{t("cz.apply.selectPrompt")}</option>
+                  <option value="yes">{t("common.yes")}</option>
+                  <option value="no">{t("common.no")}</option>
+                </select>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Housing (PMAY-Gramin): current dwelling status. */}
+          {cat === "HOUSING" && (
+            <div className="form-row">
+              <label className="lbl">{t("cz.apply.houseStatus")}</label>
+              <select className="field" value={form.houseStatus} onChange={(e) => setForm({ ...form, houseStatus: e.target.value })}>
+                <option value="">{t("cz.apply.selectPrompt")}</option>
+                <option value="0">{t("cz.apply.house.adequate")}</option>
+                <option value="1">{t("cz.apply.house.kutcha")}</option>
+                <option value="2">{t("cz.apply.house.houseless")}</option>
+              </select>
+            </div>
+          )}
+
           <button className="btn btn-accent btn-lg btn-block" disabled={busy || !form.pan} onClick={submit}>
             {busy ? <><span className="spinner" style={{ borderTopColor: "#3a2200" }} /> {t("cz.apply.verifying")}</> : t("cz.apply.verifySubmit")}
           </button>

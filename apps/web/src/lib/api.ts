@@ -148,7 +148,11 @@ export const api = {
   myApplications: () => GET<AppView[]>("/applications/mine"),
   allApplications: () => GET<AdminAppView[]>("/applications"),
   application: (id: string) => GET<AppView>(`/applications/${id}`),
-  createApplication: (b: { schemeId: number; pan: string; kissan?: string; land?: string }) =>
+  createApplication: (b: {
+    schemeId: number; pan: string;
+    kissan?: string; land?: string;
+    caste?: number; isStudent?: boolean; houseStatus?: number;
+  }) =>
     POST<{ id: string; status: string; applicant?: { name: string } }>("/applications", b),
   uploadDocument: (id: string, file: File, docType: string, declaredId?: string) => {
     const form = new FormData();
