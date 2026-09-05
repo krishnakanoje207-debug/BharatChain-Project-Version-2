@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { Contract, JsonRpcProvider, Wallet, InterfaceAbi } from "ethers";
+import { Contract, FetchRequest, JsonRpcProvider, Wallet, InterfaceAbi } from "ethers";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
@@ -55,7 +55,7 @@ export class ChainService implements OnModuleInit, OnModuleDestroy {
     const key = this.config.get<string>("RELAYER_PRIVATE_KEY");
     if (!key) throw new Error("RELAYER_PRIVATE_KEY is not set");
 
-    this.provider = new JsonRpcProvider(rpc, undefined, { batchMaxCount: 1 });
+    this.provider = new JsonRpcProvider(this.buildRpcRequest(rpc), undefined, { batchMaxCount: 1 });
     this.relayer = new Wallet(key, this.provider);
     this.deployment = this.loadDeployment();
     this.logger.log(
@@ -66,6 +66,34 @@ export class ChainService implements OnModuleInit, OnModuleDestroy {
   onModuleDestroy(): void {
     // Stop the provider's polling loop so short-lived contexts (e.g. the seeder) exit cleanly.
     this.provider?.destroy();
+  }
+
+  /**
+   * Free public RPC endpoints fail intermittently — drpc's free plan answers a
+   * perfectly valid single call with HTTP 500 "Temporary internal error. Please
+   * retry" (code 19). ethers only auto-retries 429, so one blip would otherwise
+   * surface to a citizen as a failed scheme lookup. `processFunc` promotes 5xx
+   * into ethers' own throttle/backoff path.
+   *
+   * Reads only: a 5xx on `eth_sendRawTransaction` is ambiguous (the tx may have
+   * landed), and resending would race the managed nonce, so writes still fail
+   * fast and let `runExclusive` resync.
+   */
+  private buildRpcRequest(rpc: string): FetchRequest {
+    const req = new FetchRequest(rpc);
+    req.timeout = 20_000;
+    req.setThrottleParams({ maxAttempts: 5, slotInterval: 300 });
+    req.processFunc = async (request, response) => {
+      if (response.statusCode >= 500 && response.statusCode < 600) {
+        const body = request.body ? new TextDecoder().decode(request.body) : "";
+        if (!body.includes("eth_sendRawTransaction")) {
+          this.logger.warn(`RPC ${response.statusCode} from ${rpc} — retrying`);
+          response.throwThrottleError(`RPC ${response.statusCode}`, 300);
+        }
+      }
+      return response;
+    };
+    return req;
   }
 
   private loadDeployment(): DeploymentFile {
