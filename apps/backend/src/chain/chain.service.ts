@@ -55,7 +55,7 @@ export class ChainService implements OnModuleInit, OnModuleDestroy {
     const key = this.config.get<string>("RELAYER_PRIVATE_KEY");
     if (!key) throw new Error("RELAYER_PRIVATE_KEY is not set");
 
-    this.provider = new JsonRpcProvider(rpc);
+    this.provider = new JsonRpcProvider(rpc, undefined, { batchMaxCount: 1 });
     this.relayer = new Wallet(key, this.provider);
     this.deployment = this.loadDeployment();
     this.logger.log(

@@ -8,6 +8,14 @@ export async function getPoseidon() {
   return _poseidon;
 }
 
+/**
+ * Poseidon hashing is synchronous CPU work, and `await` on an already-resolved value only drains
+ * the microtask queue — a long hashing loop therefore starves the event loop completely. Callers
+ * yield a real macrotask every few hundred hashes so pending I/O (e.g. the Postgres TLS/SCRAM
+ * handshake, which the server aborts with "Authentication timed out") can still make progress.
+ */
+export const yieldToEventLoop = () => new Promise((resolve) => setImmediate(resolve));
+
 export const Profession = { UNKNOWN: 0, FARMER: 1, NON_FARMER: 2 };
 
 /** Encode a document-id string/number to a field element (big-endian bytes as BigInt). */
@@ -60,6 +68,7 @@ export async function buildMerkleTree(leaves, levels = 16) {
       const left = prev[i];
       const right = i + 1 < prev.length ? prev[i + 1] : zeros[l];
       next.push(hp(left, right));
+      if (next.length % 256 === 0) await yieldToEventLoop();
     }
     if (next.length === 0) next.push(zeros[l + 1]);
     layers.push(next);

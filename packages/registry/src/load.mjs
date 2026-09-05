@@ -3,7 +3,12 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
-import { recordLeaf, buildMerkleTree, getMerkleProof } from "@bharatchain/circuits/src/zk.mjs";
+import {
+  recordLeaf,
+  buildMerkleTree,
+  getMerkleProof,
+  yieldToEventLoop,
+} from "@bharatchain/circuits/src/zk.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = resolve(here, "..", "data");
@@ -21,7 +26,10 @@ export function loadRegistryRoot() {
 /** Build the registry Merkle tree (leaves in fixture order). Returns { tree, leaves }. */
 export async function buildRegistryTree(records = loadRegistry(), levels = REGISTRY_LEVELS) {
   const leaves = [];
-  for (const r of records) leaves.push(await recordLeaf(r));
+  for (const r of records) {
+    leaves.push(await recordLeaf(r));
+    if (leaves.length % 256 === 0) await yieldToEventLoop();
+  }
   const tree = await buildMerkleTree(leaves, levels);
   return { tree, leaves };
 }

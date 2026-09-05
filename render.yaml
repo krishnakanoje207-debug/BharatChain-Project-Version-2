@@ -5,7 +5,10 @@
 #   DATABASE_URL         Neon Postgres URL (keep ?sslmode=require)
 #   REDIS_URL            Upstash Redis rediss:// URL
 #   RELAYER_PRIVATE_KEY  fresh funded Amoy key — NEVER the Hardhat dev key
-#   CHAIN_RPC_URL        Amoy RPC (e.g. https://rpc-amoy.polygon.technology)
+#   CHAIN_RPC_URL        Amoy RPC — Alchemy free tier (https://polygon-amoy.g.alchemy.com/v2/<key>).
+#                        Polygon's own public endpoint was deprecated 17 Jul 2026; free public RPCs
+#                        also cap JSON-RPC batches (drpc free rejects >3), which is why ChainService
+#                        pins batchMaxCount: 1.
 #   CORS_ORIGINS         the Vercel URL(s), comma-separated
 #   GROQ_API_KEY         assistant LLM (free tier)
 #   ADMIN_PHONE/ADMIN_PASSWORD  strong values used when the DB was seeded
