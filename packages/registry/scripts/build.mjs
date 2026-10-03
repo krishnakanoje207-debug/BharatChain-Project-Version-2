@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
 import { generateRegistry } from "../src/generate.mjs";
 import { recordLeaf, buildMerkleTree } from "@bharatchain/circuits/src/zk.mjs";
+import { serializeRegistryTree } from "../src/load.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = resolve(here, "..", "data");
@@ -38,5 +39,6 @@ writeFileSync(
   join(dataDir, "registry-root.json"),
   JSON.stringify({ root: tree.root.toString(), count: records.length, levels: LEVELS }, null, 2),
 );
+writeFileSync(join(dataDir, "registry-tree.json"), JSON.stringify(serializeRegistryTree(tree)));
 console.log("registry root:", tree.root.toString());
-console.log("saved -> data/registry.json + data/registry-root.json");
+console.log("saved -> data/registry.json + data/registry-root.json + data/registry-tree.json");

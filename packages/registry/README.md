@@ -9,6 +9,9 @@ must **never** be randomized at runtime. Real citizens are appended on request.
 - `src/generate.mjs` — deterministic generator (fixed seed `20260621`).
 - `data/registry.json` — the committed 10,000-record fixture (source of truth).
 - `data/registry-root.json` — the committed Poseidon Merkle root (depth 16) + count.
+- `data/registry-tree.json` — the precomputed tree, so backend boot skips ~30k Poseidon hashes. Used only
+  when its root equals `registry-root.json`; otherwise `buildRegistryTree()` hashes from scratch.
+  Rewrite it from the existing fixture with `npm run build:tree -w @bharatchain/registry`.
 - `src/load.mjs` — `loadRegistry()`, `loadRegistryRoot()`, `buildRegistryTree()` for the backend
   (eligibility lookup + ZK witness construction).
 

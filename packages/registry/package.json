@@ -7,6 +7,7 @@
   "main": "src/load.mjs",
   "scripts": {
     "build:registry": "node scripts/build.mjs",
+    "build:tree": "node scripts/build-tree.mjs",
     "build": "echo \"(registry: run 'npm run build:registry' to regenerate the fixture)\" && exit 0",
     "lint": "echo \"(registry lint: TBD)\" && exit 0"
   },

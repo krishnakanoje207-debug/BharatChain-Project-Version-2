@@ -64,9 +64,12 @@ export class RegistryService implements OnModuleInit {
   private zkey = "";
   private ready: Promise<void> | null = null;
 
-  onModuleInit(): void {
-    // Kick off the (~20s) tree build in the background; first use awaits it.
+  async onModuleInit(): Promise<void> {
+    // Finish loading before the app starts listening: the tree is precomputed (data/registry-tree.json),
+    // so this is ~2s of module import + JSON parse. Serving requests while that synchronous work runs
+    // would stall the event loop under them (Postgres handshakes time out → 500s after a cold start).
     this.ready = this.load();
+    await this.ready;
   }
 
   private async load(): Promise<void> {

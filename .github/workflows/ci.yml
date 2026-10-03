@@ -45,7 +45,7 @@ jobs:
       - run: npm ci
       - name: Build shared types
         run: npm run build -w @bharatchain/shared
-      - name: Backend tests (92, infra-free)
+      - name: Backend tests (121, infra-free)
         run: npm test -w @bharatchain/backend
       - name: Build frontend
         run: npm run build -w @bharatchain/web

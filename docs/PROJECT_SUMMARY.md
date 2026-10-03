@@ -52,7 +52,7 @@ is production-shaped but sized to run on a laptop for a demo.
 
 | App | Port | Audience | Purpose |
 |---|---|---|---|
-| `web` | 3000 | All (role-routed) | Unified National Welfare Portal — public home/schemes/ledger/about; citizen dashboard, apply (ZK), wallet+pay, history, notifications; vendor portal; admin (disbursement, anomalies, file redemptions, vendors); RBI (treasury, redemption approve/reject, disbursement); AI assistant (public info-desk for visitors + personal mode for signed-in citizens) |
+| `web` | 3000 | All (role-routed) | Unified National Welfare Portal — public home/schemes/ledger/about; citizen dashboard, apply (ZK), wallet+pay, history, notifications; vendor portal (business enrolment, redemptions); admin (schemes, applications, disbursement, vendor approvals, redemptions, anomalies); RBI (treasury, redemption approve/reject, disbursement); AI assistant (public info-desk for visitors + personal mode for signed-in citizens) |
 
 ---
 
@@ -63,19 +63,19 @@ Everything is free / OSS / free-tier.
 | Layer | Technology |
 |---|---|
 | **Smart contracts** | Solidity, Hardhat, OpenZeppelin |
-| **Chain** | Local Hardhat node (dev) + free L2 testnet (Polygon Amoy / Arbitrum Sepolia) story |
+| **Chain** | Local Hardhat node (dev) + **Polygon Amoy testnet (live, 13 contracts)** for the hosted deployment |
 | **Zero-knowledge** | Circom 2.2.3 + snarkjs (Groth16), Poseidon Merkle tree (depth 16) |
 | **Backend** | Node + NestJS, TypeORM (PostgreSQL), ioredis (Redis) |
 | **Event pipeline** | Apache Kafka (KRaft mode) for anomaly/fraud detection |
 | **Indexer** | The Graph (self-hosted Graph Node + IPFS) → public GraphQL ledger |
 | **AI assistant** | Two surfaces: anonymous public info-desk (KB + scheme catalog only, IP rate-limited) and CITIZEN-gated personal RAG. Pluggable LLM (Groq / Gemini / Ollama via `OLLAMA_MODEL`) + Bhashini ULCA covering all 14 site languages; deterministic grounded responder as $0 fallback |
-| **Frontends** | React + Vite (SPA), shared design system `@bharatchain/web-ui` |
+| **Frontend** | One unified React + Vite + TS SPA (`apps/web`), role-routed, hand-authored design-system CSS |
 | **Auth** | Phone + OTP (simulated SMS) + password; JWT + refresh rotation; Redis heartbeat sessions; lockout |
 | **File storage** | MinIO (S3-compatible) for application documents |
 | **Email** | Nodemailer (real, free Gmail SMTP) — best-effort |
 | **Automation** | node-cron (local) + Chainlink Automation (testnet story) |
-| **Infra** | Docker Compose — Postgres, Redis, Kafka, Graph Node + IPFS, MinIO |
-| **CI/CD** | GitHub Actions (contract tests + backend suite + frontend builds gate every push) |
+| **Infra** | Local: Docker Compose — Postgres, Redis, Kafka, Graph Node + IPFS, MinIO. Hosted: Vercel (web) + Render (API) + Neon (Postgres) + Upstash (Redis) + Amoy |
+| **CI/CD** | GitHub Actions (contract tests + backend suite + frontend build + lint gate every push) |
 | **Tooling** | npm workspaces (monorepo) + npx, Node ≥ 20 (built on 24) |
 | **Sovereign AI** | `ai-model/` side project — QLoRA fine-tune of an open base (Llama/Sarvam/AI4Bharat) for self-hosted, data-sovereign deployment (not wired into the site) |
 
@@ -94,20 +94,21 @@ apps/
   indexer/      The Graph subgraph (public welfare ledger)
   web/          Unified National Welfare Portal — one Vite+React app, role-routed   :3000
 packages/
-  contracts/    Solidity + Hardhat (10 contracts)
-  circuits/     Circom + snarkjs ZK circuits
-  registry/     Fixed 10,000-record government reference registry (committed fixture)
+  contracts/    Solidity + Hardhat (13 deployed contracts)
+  circuits/     Circom + snarkjs ZK circuits (citizen eligibility + vendor eligibility)
+  registry/     Fixed 10,000-record government reference registry (committed fixture + precomputed tree)
+  vendor-registry/ Fixed business registry for vendor ZK enrolment
   shared/       Shared TypeScript types/enums
-  web-ui/       Shared frontend design system + typed API client + AuthProvider
 ai-model/       Self-hosted sovereign assistant model — dataset + LoRA pipeline (NOT wired in)
 infra/          docker-compose.yml
+render.yaml     Render blueprint for the hosted API
 scripts/        demo up/down + smoke / stress / on-chain-verification scripts
 docs/           IMPLEMENTATION_PLAN · DECISIONS · DEMO · this summary
 ```
 
 ---
 
-## 4. Smart contracts (10)
+## 4. Smart contracts (13 deployed)
 
 | Contract | Role |
 |---|---|
@@ -115,11 +116,13 @@ docs/           IMPLEMENTATION_PLAN · DECISIONS · DEMO · this summary
 | `DigitalRupee` | **Transfer-restricted ERC-20 e₹** — citizens may only pay category-allowed approved vendors; only vendors → redemption. Mint invariant: minted ≤ fund |
 | `SchemeRegistry` | Schemes + per-scheme fund with **draw-down** accounting |
 | `VendorRegistry` | Approved vendors + category allow-list |
+| `VendorEnrollmentRegistry` | Per-scheme ZK enrolment of vendors |
 | `BeneficiaryRegistry` | Enrolled beneficiaries |
 | `DisbursementController` | **Pull-based** Merkle-claim disbursal (no on-chain loop) with variable per-citizen amounts |
 | `PaymentRouter` | Citizen → vendor entitlement payments |
 | `RedemptionController` | Vendor redemption → consume + burn |
-| `Verifier` + `ZKEnroller` | Groth16 verifier + enroll-with-proof entrypoint |
+| `Groth16Verifier` + `ZKEnroller` | Citizen Groth16 verifier + enroll-with-proof entrypoint |
+| `VendorGroth16Verifier` + `VendorZKEnroller` | Vendor Groth16 verifier + per-scheme vendor enrolment |
 
 **Hardening baked in:** pull-based disbursal (no gas-bomb loops), proof-of-delivery gates
 redemption, identity-derived in-circuit nullifier (PAN + schemeId), role separation, no PII
@@ -130,13 +133,22 @@ on-chain (only commitments).
 ## 5. Zero-knowledge layer
 
 - `eligibility.circom` — Poseidon Merkle proof (depth 16) against the fixed 10k registry root
-  + farmer / unknown-doc eligibility predicate + nullifier.
-- Committed registry root:
-  `10093031644768308786192335454823296287178094785506788504260158440690735194452`
+  + a **per-category eligibility predicate** selected by the scheme's sector + nullifier:
+  - **Agriculture (PM-Kisan):** farmer, or unknown profession with Kisan card + land record.
+  - **Education (NSP Post-Matric):** enrolled student AND reserved caste AND income under that caste's
+    ceiling (SC/ST ₹2.5L, OBC ₹1.5L, EBC ₹1L, Minority ₹2L; General not covered).
+  - **Housing (PMAY-G):** houseless/kutcha AND income ≤ ₹1.8L AND not excluded.
+- Registry leaf = Poseidon of 9 fields (PAN, Kisan card, land, profession, income, isStudent, caste,
+  houseStatus, housingExcluded). Committed registry root:
+  `1970097898494689922555840686472960985925572180835460698113250088530657316853`
+- `vendorEligibility.circom` — the same pattern for businesses against the fixed vendor registry.
+- The tree is committed precomputed (`data/registry-tree.json`) so the API does not re-hash ~30k
+  Poseidon nodes on every cold start.
 - Registry composition: **4019 farmer / 3474 non-farmer / 2507 unknown** (1531 with docs).
 - Flow: backend matches PAN against the registry → builds witness → snarkjs Groth16 proof →
-  relayer calls `enrollWithProof`. Farmers + unknown-with-docs are **APPROVED & on-chain**;
-  non-farmers **REJECTED**.
+  relayer calls `enrollWithProof`. A record that satisfies the **applied scheme's** predicate is
+  **APPROVED & on-chain**; one that fails it cannot produce a proof and is **REJECTED** (e.g. a
+  non-farmer for PM-Kisan, a General-category or non-student applicant for the scholarship).
 - The **nullifier is identity-derived**, so the same PAN can't re-enroll the same scheme
   (anti-double-dip), enforced in-circuit.
 
@@ -151,12 +163,13 @@ npm-workspaces monorepo, `infra/docker-compose.yml` (Postgres / Redis / Kafka-KR
 IPFS + Graph-Node / MinIO), GitHub Actions CI, NestJS `/health`.
 
 ### Phase 1 — Contracts
-8 → 10 Solidity contracts (see §4). `deploy.ts` wires roles and **bundles ABIs + addresses**
+Core Solidity contracts (grown to the 13 deployed in §4). `deploy.ts` wires roles and **bundles ABIs + addresses**
 into `deployments/<network>.json` (consumed by backend + indexer).
 
 ### Phase 2 — Zero-knowledge
-`eligibility.circom`, generated `Verifier.sol`, `ZKEnroller.sol`. 10 contracts total,
-**6 Hardhat tests pass** including a real proof.
+`eligibility.circom`, generated `Verifier.sol`, `ZKEnroller.sol`; later the vendor side
+(`vendorEligibility.circom`, `VendorGroth16Verifier`, `VendorZKEnroller`). 13 contracts deployed,
+**7 Hardhat tests pass** including real citizen and vendor proofs.
 
 ### Phase 3 — Registry + Backend intake
 - `@bharatchain/registry`: committed **fixed 10k registry** (never randomized) + root.
@@ -170,7 +183,7 @@ into `deployments/<network>.json` (consumed by backend + indexer).
 - **Application intake:** PAN match vs registry → docs to MinIO auto-verify → Groth16 proof via
   snarkjs → relayer `enrollWithProof`.
 - **Seeder** (`npm run seed`): idempotent — 3 demo schemes + registry root + 8 demo
-  institutions/vendors + scheme metadata + a demo **admin** user.
+  institutions/vendors + scheme metadata + a demo **admin** and **RBI** user.
 
 ### Phase 4 — Disbursal
 - `DisbursementService.runRound(schemeId)` builds an OZ `StandardMerkleTree` of
@@ -189,8 +202,12 @@ into `deployments/<network>.json` (consumed by backend + indexer).
   category gate as the contract).
 - **Payments module:** citizen `POST /payments` (relayer pays an allowed vendor from the
   entitlement), `POST /payments/:id/confirm` → DELIVERED/redeemable, `GET /payments`.
-- **Redemption module:** ADMIN/RBI file redemption with ITR/legitimacy capture; RBI approve →
-  on-chain consume + burn + simulated NEFT ref; reject; list/detail.
+- **Vendor onboarding:** a VENDOR-role account submits its business (`POST /vendor-applications`,
+  matched against the fixed business registry); ADMIN approves → on-chain `approveVendor` + per-scheme
+  vendor ZK enrolment, or rejects.
+- **Redemption module:** the vendor files its own redemption of delivered value
+  (`POST /redemptions/mine`, ITR/legitimacy capture; ADMIN can still file on a vendor's behalf);
+  RBI approve → on-chain consume + burn + simulated NEFT ref; reject; list/detail.
 - **Critical robustness fix:** `ChainService.runExclusive()` serializes **all** relayer txs
   (mutex + managed nonce + resync) — fixes nonce collisions between cron / disbursal / payments /
   redemption sharing the single relayer.
@@ -222,18 +239,28 @@ into `deployments/<network>.json` (consumed by backend + indexer).
   institutionally. Enforced in prompts + KB + training data, with a regression test.
 
 ### Phase 8 — Frontends
-- 4 React + Vite apps (see §1 table) + shared **`packages/web-ui`** (`@bc/ui` path alias) —
-  theme.css design system, typed API client, AuthProvider + heartbeat, PortalLayout/Login,
-  reusable admin/RBI panels — **built only around real endpoints, no fake buttons**.
-- Design from captured india.gov.in direction: navy / saffron `#FF9933` / maroon `#C8102E`,
-  Ashoka emblem, accessibility strip (font-size, high-contrast, language).
+- **One unified `apps/web`** (Vite + React + TS, see §1 table), role-routed: public site
+  (home / schemes / ledger / about), citizen, vendor, admin and RBI portals. Hand-authored
+  design-system CSS (`styles/theme.css` + `app.css`), typed API client, AuthProvider + heartbeat,
+  PortalLayout, reusable admin/RBI panels — **built only around real endpoints, no fake buttons**.
+  (Rebuilt from scratch 2026-06-26; the original 4 apps + `packages/web-ui` were deleted.)
+- Gov-portal look: navy / saffron, Ashoka emblem, accessibility strip (text size, high contrast,
+  language).
+- **i18n:** 14 languages (incl. RTL Urdu) across the public site and the citizen + vendor portals;
+  admin/RBI screens are English.
 - **Live counters:** `usePoll(fn, ms)` re-fetches balances / disbursed totals / rounds /
   anomalies every ~5–6s so values tick up as the backend increments.
 
 ### Phase 9 — CI/CD, testnet, demo, docs
 - CI (`.github/workflows/ci.yml`): contracts job (circom + zk:build + compile + contract tests) +
-  app job (backend suite + 4 frontend builds + lint).
-- Testnet `deploy:amoy` / `deploy:arbitrum` scripts (need a funded faucet key for a real deploy).
+  app job (backend suite + the `apps/web` production build + lint).
+- **Testnet: LIVE on Polygon Amoy** (chainId 80002) — all 13 contracts deployed, addresses + ABIs in
+  `packages/contracts/deployments/amoy.json`. Polygon's own public Amoy RPC was deprecated in Jul 2026;
+  the hosted API uses a third-party Amoy RPC.
+- **Hosted stack:** web on Vercel (https://bharatchain-web.vercel.app), API on Render
+  (https://bharatchain-backend.onrender.com, blueprint `render.yaml`), Postgres on Neon, Redis on
+  Upstash. Kafka is disabled on hosted (`KAFKA_ENABLED=false`) and MinIO is not hosted (document
+  uploads are best-effort / 503).
 - **One-command demo:** `scripts/demo-up.ps1` / `demo-down.ps1` + `docs/DEMO.md` walkthrough.
 
 ---
@@ -262,8 +289,8 @@ These were real bugs found via adversarial testing and fixed:
 
 ## 8. Verification & testing
 
-- **Contract tests:** 6 Hardhat tests (incl. a real ZK proof).
-- **Backend unit suite:** **100 tests, all green**, run via `node:test` against compiled `dist/`
+- **Contract tests:** 7 Hardhat tests (incl. real citizen + vendor ZK proofs).
+- **Backend unit suite:** **121 tests, all green**, run via `node:test` against compiled `dist/`
   (zero new deps — no jest), hand-rolled mocks, no infra needed (`npm test -w @bharatchain/backend`).
 - **Smoke / stress / verification scripts** (`scripts/`):
   - `final-smoke.ps1` (15), `loophole-probe.ps1` (28), `loophole-probe2.ps1` (11) — adversarial probes
@@ -273,8 +300,15 @@ These were real bugs found via adversarial testing and fixed:
   - `onchain-verify.mjs` (12) — drives a real enroll→disburse→pay→confirm, then reads the chain
     **directly with ethers**: every tx receipt `status=1`, on-chain entitlement moves by exactly the
     expected amount, **backend API view == direct on-chain read**, invariant disbursed ≤ fund holds.
+  - `per-scheme-predicate.mjs` — same citizens approved/rejected differently per scheme sector
+    (agri / education / housing predicates); `multi-scheme-eligibility.ps1` — one identity across schemes
+  - `vendor-zk-gate.mjs` — an approved but un-ZK-enrolled vendor is blocked at payment, allowed once enrolled
 - **Scale proof:** 112 citizens × 3 installment rounds — **0 failures across 324 on-chain claims**;
   early cohort hit exactly 30,000 e₹ each, late joiners caught up correctly, nobody over the cap.
+- **Hosted end-to-end (2026-09-05):** a full citizen journey on the live Vercel + Render + Amoy stack —
+  signup → OTP → apply → Groth16 proof → APPROVED on-chain → disbursement round → 20,000 e₹
+  entitlement → pay vendor 1,500 → confirm DELIVERED → balance 18,500 → wrong-sector vendor blocked
+  (HTTP 400). Proof generation takes ~33s on Render's free tier vs ~1.7s locally.
 
 ---
 
@@ -295,8 +329,10 @@ Manual order: `npm run infra:up` → `npm run node -w @bharatchain/contracts` (s
 `npm run deploy:local -w @bharatchain/contracts` → `npm run seed -w @bharatchain/backend` →
 `npm run backend:dev`. Backend on **:3001**, routes under `/api`.
 
-**Demo logins:** ADMIN `9000000000` / `admin12345`. Eligible PANs: `LJAAN1880Y`, `LEFSK8542C`,
-`JSQUP2551W`, `WMRTS2648Z`; non-farmer `DYCNH0035D` is rejected. (See `docs/DEMO.md`.)
+**Demo logins (local dev defaults):** ADMIN `9000000000` / `admin12345`, RBI `9000000001` /
+`rbiadmin12345`. The hosted deployment uses different, strong passwords (not stored in the repo).
+PM-Kisan-eligible PANs: `LJAAN1880Y`, `LEFSK8542C`, `JSQUP2551W`, `WMRTS2648Z`; non-farmer
+`DYCNH0035D` is rejected. (See `docs/DEMO.md`.)
 
 > ⚠️ Re-running scale/installment tests needs a clean counter: redeploy:local + DROP SCHEMA +
 > reseed + restart backend (so ChainService loads the new addresses), since each run leaves the
@@ -326,9 +362,11 @@ national infrastructure:
   vendor, admin and RBI. The old 4 apps + `@bc/ui` were removed. Backend/auth/API/endpoints unchanged.
 - **Seeder:** both an ADMIN (`9000000000`/`admin12345`) and an RBI_ADMIN (`9000000001`/`rbiadmin12345`)
   are seeded; override via `ADMIN_PHONE`/`ADMIN_PASSWORD` and `RBI_PHONE`/`RBI_PASSWORD`.
-- **Optional polish (non-blocking):** real testnet deploy; wire the public-ledger page to The Graph
-  (currently a live transparency view over the public schemes API); admin backend endpoints for
-  create-scheme / approve-vendor / list-all-applications (currently seeder/on-chain only).
+- **Done since:** real testnet deploy (Polygon Amoy, hosted stack live — see Phase 9); admin endpoints
+  for create/update scheme (`POST`/`PATCH /schemes`), vendor-application approve/reject
+  (`/vendor-applications/:id/approve|reject`) and list-all-applications (`GET /applications`).
+- **Known gaps (non-blocking):** the public-ledger page is not wired to The Graph (it is a live
+  transparency view over the public schemes API); assistant voice (ASR/TTS) not built; the QLoRA
+  sovereign model is not trained; no Bhashini credentials (translation passes through).
 
 > Prototype — no real funds, simulated SMS / bank payout, no PII on-chain.
-```
